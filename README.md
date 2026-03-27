@@ -53,7 +53,7 @@ docker build -t request-capture-tool .
 6. Run container:
 
 ```bash
-docker run -p 8080:8080 request-capture-tool
+docker run -d --name request-capture-tool -p 8080:8080 request-capture-tool
 ```
 
 ---

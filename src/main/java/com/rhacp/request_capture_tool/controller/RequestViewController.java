@@ -35,7 +35,7 @@ public class RequestViewController {
         model.addAttribute("requests", requests);
         model.addAttribute("selectedGroup", group);
 
-        return "requests";
+        return "requests-list";
     }
 
     @GetMapping("/{id}")
