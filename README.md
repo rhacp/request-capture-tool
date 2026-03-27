@@ -38,7 +38,7 @@ and adjust any configuration if needed.
 
 3. Open the project root folder in terminal / command prompt.
 
-4. Build the project:
+4. Build the project (for testing):
 
 ```bash
 mvn clean package
