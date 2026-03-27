@@ -107,7 +107,7 @@
             border-collapse: collapse;
             background: #1b1b1b;
             border: 1px solid #2d2d2d;
-            table-layout: fixed;
+            table-layout: auto;
         }
 
         th, td {
@@ -122,6 +122,20 @@
         th {
             background: #232323;
             color: #ffffff;
+        }
+
+        .col-field {
+            width: 180px;
+            white-space: nowrap;
+        }
+
+        .col-type {
+            width: 120px;
+            white-space: nowrap;
+        }
+
+        .col-value {
+            width: auto;
         }
 
         ul {
@@ -468,16 +482,16 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Field</th>
-                    <th>Value</th>
-                    <th>Type</th>
+                    <th class="col-field">Field</th>
+                    <th class="col-value">Value</th>
+                    <th class="col-type">Type</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="field : ${leftRequest.bodyFields}">
-                    <td th:text="${field.fieldPath}"></td>
-                    <td th:text="${field.fieldValue}"></td>
-                    <td th:text="${field.valueType}"></td>
+                    <td class="col-field" th:text="${field.fieldPath}"></td>
+                    <td class="col-value" th:text="${field.fieldValue}"></td>
+                    <td class="col-type" th:text="${field.valueType}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -516,16 +530,16 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Field</th>
-                    <th>Value</th>
-                    <th>Type</th>
+                    <th class="col-field">Field</th>
+                    <th class="col-value">Value</th>
+                    <th class="col-type">Type</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="field : ${rightRequest.bodyFields}">
-                    <td th:text="${field.fieldPath}"></td>
-                    <td th:text="${field.fieldValue}"></td>
-                    <td th:text="${field.valueType}"></td>
+                    <td class="col-field" th:text="${field.fieldPath}"></td>
+                    <td class="col-value" th:text="${field.fieldValue}"></td>
+                    <td class="col-type" th:text="${field.valueType}"></td>
                 </tr>
                 </tbody>
             </table>
