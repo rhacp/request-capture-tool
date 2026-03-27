@@ -1,0 +1,72 @@
+# Maven
+**/target/
+
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Spring local config
+**/src/main/resources/application-dev.yml
+**/src/main/resources/application-dev.yaml
+**/src/main/resources/application-local.yml
+**/src/main/resources/application-local.yaml
+**/src/main/resources/application-prod.yml
+**/src/main/resources/application-prod.yaml
+
+# Environment files
+.env
+.env.*
+
+# Keep example env files
+!.env.example
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# STS / Eclipse
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# VS Code
+.vscode/
+
+# Node
+frontend/react-app/node_modules/
+
+# Build
+target/
+
+# Thymeleaf / template cache (optional safety)
+**/templates/cache/
+**/templates/*.cache
+
+# Static generated files (if ever used)
+**/static/dist/
+**/static/build/
+
+# H2 database files
+data/
+*.mv.db
+*.trace.db

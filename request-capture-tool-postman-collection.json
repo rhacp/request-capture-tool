@@ -1,0 +1,312 @@
+{
+  "info": {
+    "name": "Request Capture Tool",
+    "_postman_id": "7f5f2e76-0f1a-4d1a-9f1d-rcapturetool",
+    "description": "Requests for testing the request-capture-tool endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "group",
+      "value": "test-group"
+    }
+  ],
+  "item": [
+    {
+      "name": "BackUrl",
+      "item": [
+        {
+          "name": "GET BackUrl with query params",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/capture/backurl/{{group}}?status=SUCCESS&orderId=123&amount=100",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "backurl",
+                "{{group}}"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "SUCCESS"
+                },
+                {
+                  "key": "orderId",
+                  "value": "123"
+                },
+                {
+                  "key": "amount",
+                  "value": "100"
+                }
+              ]
+            },
+            "description": "Tests GET redirect capture with query parameters."
+          },
+          "response": []
+        },
+        {
+          "name": "POST BackUrl JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUCCESS\",\n  \"orderId\": \"123\",\n  \"amount\": 100,\n  \"paid\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/capture/backurl/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "backurl",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests POST redirect capture with JSON body."
+          },
+          "response": []
+        },
+        {
+          "name": "POST BackUrl x-www-form-urlencoded",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "status",
+                  "value": "SUCCESS",
+                  "type": "text"
+                },
+                {
+                  "key": "orderId",
+                  "value": "123",
+                  "type": "text"
+                },
+                {
+                  "key": "amount",
+                  "value": "100",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/capture/backurl/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "backurl",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests POST redirect capture with HTML form POST body."
+          },
+          "response": []
+        },
+        {
+          "name": "POST BackUrl multipart form-data",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "status",
+                  "value": "SUCCESS",
+                  "type": "text"
+                },
+                {
+                  "key": "orderId",
+                  "value": "123",
+                  "type": "text"
+                },
+                {
+                  "key": "amount",
+                  "value": "100",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/capture/backurl/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "backurl",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests POST redirect capture with multipart form-data body."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Webhook",
+      "item": [
+        {
+          "name": "GET Webhook",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/capture/webhook/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "webhook",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests webhook health-check GET; should always return 200."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"SUCCESS\",\n  \"order\": {\n    \"id\": \"123\",\n    \"amount\": 100\n  },\n  \"paid\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/capture/webhook/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "webhook",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests webhook POST with JSON body."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook x-www-form-urlencoded",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "status",
+                  "value": "SUCCESS",
+                  "type": "text"
+                },
+                {
+                  "key": "orderId",
+                  "value": "123",
+                  "type": "text"
+                },
+                {
+                  "key": "amount",
+                  "value": "100",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/capture/webhook/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "webhook",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests webhook POST with HTML form POST body."
+          },
+          "response": []
+        },
+        {
+          "name": "POST Webhook multipart form-data",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "status",
+                  "value": "SUCCESS",
+                  "type": "text"
+                },
+                {
+                  "key": "orderId",
+                  "value": "123",
+                  "type": "text"
+                },
+                {
+                  "key": "amount",
+                  "value": "100",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/capture/webhook/{{group}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "capture",
+                "webhook",
+                "{{group}}"
+              ]
+            },
+            "description": "Tests webhook POST with multipart form-data body."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

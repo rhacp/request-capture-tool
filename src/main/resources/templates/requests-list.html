@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Captured Requests</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+            background: #121212;
+            color: #e6e6e6;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .card {
+            background: #1b1b1b;
+            border: 1px solid #2d2d2d;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1b1b1b;
+            border: 1px solid #2d2d2d;
+        }
+
+        th, td {
+            border: 1px solid #2d2d2d;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #232323;
+            color: #ffffff;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #101010;
+            color: #e6e6e6;
+            border: 1px solid #2d2d2d;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        a {
+            color: #64b5f6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            color: #999999;
+            font-style: italic;
+        }
+
+        .muted {
+            color: #aaaaaa;
+        }
+
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+
+        form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 8px;
+            min-width: 160px;
+            background: #181818;
+            color: #e6e6e6;
+            border: 1px solid #333333;
+            border-radius: 6px;
+        }
+
+        button,
+        .link-button {
+            padding: 8px 12px;
+            border: 1px solid #3a3a3a;
+            background: #242424;
+            color: #e6e6e6;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        button:hover,
+        .link-button:hover {
+            background: #2e2e2e;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Captured Requests</h1>
+
+<!-- FILTER -->
+<div class="card">
+    <div class="section-title">Filter</div>
+
+    <form method="get" action="/ui/requests">
+        <label for="group"><strong>Group:</strong></label>
+        <input
+                type="text"
+                id="group"
+                name="group"
+                th:value="${selectedGroup}"
+                placeholder="Example: payment-test"
+        />
+        <button type="submit">Apply</button>
+        <a class="link-button" href="/ui/requests">Clear</a>
+    </form>
+
+    <p class="muted"
+       th:if="${selectedGroup != null and !#strings.isEmpty(selectedGroup)}">
+        Showing only group: <strong th:text="${selectedGroup}"></strong>
+    </p>
+</div>
+
+<!-- COMPARE FORM -->
+<div class="card">
+    <div class="section-title">Compare Requests</div>
+
+    <form method="get" action="/ui/compare">
+        <input type="number" name="leftId" placeholder="Left ID" required />
+        <input type="number" name="rightId" placeholder="Right ID" required />
+        <button type="submit">Compare</button>
+    </form>
+
+    <p class="muted">
+        Tip: use IDs from the table below.
+    </p>
+</div>
+
+<!-- EMPTY -->
+<div th:if="${#lists.isEmpty(requests)}" class="empty">
+    No requests captured yet.
+</div>
+
+<!-- TABLE -->
+<table th:if="${!#lists.isEmpty(requests)}">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Received At</th>
+        <th>Source</th>
+        <th>Group</th>
+        <th>Method</th>
+        <th>Content Type</th>
+        <th>Path</th>
+        <th>Details</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    <tr th:each="req : ${requests}">
+        <td th:text="${req.id}"></td>
+        <td th:text="${req.receivedAt}"></td>
+        <td th:text="${req.sourceType}"></td>
+        <td th:text="${req.groupName}"></td>
+        <td th:text="${req.method}"></td>
+        <td th:text="${req.contentTypeCategory}"></td>
+        <td th:text="${req.path}"></td>
+        <td>
+            <a th:href="@{/ui/requests/{id}(id=${req.id})}">Open</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

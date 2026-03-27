@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: request-capture-tool
+
+  datasource:
+    url: jdbc:h2:file:./data/request-capture-db
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate.format_sql: true
+
+  h2:
+    console:
+      enabled: false
+
+logging:
+  level:
+    org.hibernate.SQL: INFO
+    com.rhacp.request_capture_tool: INFO
+
+server:
+  port: ${PORT:8080}

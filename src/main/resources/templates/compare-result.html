@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Compare Requests</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+            background: #121212;
+            color: #e6e6e6;
+        }
+
+        h1, h2, h3 {
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .card {
+            background: #1b1b1b;
+            border: 1px solid #2d2d2d;
+            padding: 18px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .summary-card {
+            border: 1px solid #333;
+            background: #181818;
+        }
+
+        .summary-ok {
+            border-left: 6px solid #2e7d32;
+        }
+
+        .summary-not-ok {
+            border-left: 6px solid #c62828;
+        }
+
+        .ok {
+            color: #66bb6a;
+            font-weight: bold;
+        }
+
+        .not-ok {
+            color: #ef5350;
+            font-weight: bold;
+        }
+
+        .muted {
+            color: #aaaaaa;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .request-panel {
+            background: #171717;
+            border: 1px solid #2e2e2e;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .request-panel.left {
+            border-top: 4px solid #42a5f5;
+        }
+
+        .request-panel.right {
+            border-top: 4px solid #ab47bc;
+        }
+
+        .request-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .request-meta p {
+            margin: 6px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1b1b1b;
+            border: 1px solid #2d2d2d;
+        }
+
+        th, td {
+            border: 1px solid #2d2d2d;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: #232323;
+            color: #ffffff;
+        }
+
+        ul {
+            margin: 8px 0 0 20px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #101010;
+            color: #e6e6e6;
+            border: 1px solid #2d2d2d;
+            padding: 12px;
+            border-radius: 8px;
+            min-height: 120px;
+            overflow-x: auto;
+        }
+
+        a {
+            color: #64b5f6;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            color: #999999;
+            font-style: italic;
+        }
+
+        .section-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9e9e9e;
+            margin-bottom: 10px;
+        }
+
+        .diff-card {
+            min-height: 130px;
+        }
+
+        .top-space {
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<p><a href="/ui/requests">← Back to requests</a></p>
+
+<h1>Compare Requests</h1>
+
+<div
+        class="card summary-card"
+        th:classappend="${compareResult.structurallyEqual} ? ' summary-ok' : ' summary-not-ok'">
+
+    <div class="section-label">Comparison Summary</div>
+
+    <p><strong>Left Request ID:</strong> <span th:text="${compareResult.leftId}"></span></p>
+    <p><strong>Right Request ID:</strong> <span th:text="${compareResult.rightId}"></span></p>
+
+    <p class="top-space">
+        <strong>Result:</strong>
+        <span th:if="${compareResult.structurallyEqual}" class="ok">
+            REQUESTS ARE STRUCTURALLY IDENTICAL
+        </span>
+        <span th:unless="${compareResult.structurallyEqual}" class="not-ok">
+            REQUESTS ARE STRUCTURALLY DIFFERENT
+        </span>
+    </p>
+
+    <p class="muted">
+        Structural comparison ignores values and compares metadata, header names, query param names,
+        body field paths, and body field types.
+    </p>
+</div>
+
+<div class="card">
+    <h3>Ignored Header Rules</h3>
+    <ul th:if="${!#lists.isEmpty(compareResult.ignoredHeaderRules)}">
+        <li th:each="rule : ${compareResult.ignoredHeaderRules}" th:text="${rule}"></li>
+    </ul>
+    <p th:if="${#lists.isEmpty(compareResult.ignoredHeaderRules)}" class="empty">None</p>
+</div>
+
+<div class="grid-2">
+    <div class="request-panel left">
+        <div class="request-title">Left Request</div>
+        <div class="request-meta">
+            <p><strong>ID:</strong> <span th:text="${leftRequest.id}"></span></p>
+            <p><strong>Group:</strong> <span th:text="${leftRequest.groupName}"></span></p>
+            <p><strong>Source Type:</strong> <span th:text="${leftRequest.sourceType}"></span></p>
+            <p><strong>Method:</strong> <span th:text="${leftRequest.method}"></span></p>
+            <p><strong>Content Type Category:</strong> <span th:text="${leftRequest.contentTypeCategory}"></span></p>
+            <p><strong>Path:</strong> <span th:text="${leftRequest.path}"></span></p>
+        </div>
+    </div>
+
+    <div class="request-panel right">
+        <div class="request-title">Right Request</div>
+        <div class="request-meta">
+            <p><strong>ID:</strong> <span th:text="${rightRequest.id}"></span></p>
+            <p><strong>Group:</strong> <span th:text="${rightRequest.groupName}"></span></p>
+            <p><strong>Source Type:</strong> <span th:text="${rightRequest.sourceType}"></span></p>
+            <p><strong>Method:</strong> <span th:text="${rightRequest.method}"></span></p>
+            <p><strong>Content Type Category:</strong> <span th:text="${rightRequest.contentTypeCategory}"></span></p>
+            <p><strong>Path:</strong> <span th:text="${rightRequest.path}"></span></p>
+        </div>
+    </div>
+</div>
+
+<h2>Metadata Comparison</h2>
+
+<div class="card">
+    <table>
+        <thead>
+        <tr>
+            <th>Field</th>
+            <th>Left</th>
+            <th>Right</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Method</td>
+            <td th:text="${compareResult.leftMethod}"></td>
+            <td th:text="${compareResult.rightMethod}"></td>
+            <td>
+                <span th:if="${compareResult.sameMethod}" class="ok">MATCH</span>
+                <span th:unless="${compareResult.sameMethod}" class="not-ok">MISMATCH</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Source Type</td>
+            <td th:text="${compareResult.leftSourceType}"></td>
+            <td th:text="${compareResult.rightSourceType}"></td>
+            <td>
+                <span th:if="${compareResult.sameSourceType}" class="ok">MATCH</span>
+                <span th:unless="${compareResult.sameSourceType}" class="not-ok">MISMATCH</span>
+            </td>
+        </tr>
+        <tr>
+            <td>Content Type Category</td>
+            <td th:text="${compareResult.leftContentTypeCategory}"></td>
+            <td th:text="${compareResult.rightContentTypeCategory}"></td>
+            <td>
+                <span th:if="${compareResult.sameContentTypeCategory}" class="ok">MATCH</span>
+                <span th:unless="${compareResult.sameContentTypeCategory}" class="not-ok">MISMATCH</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<h2>All Headers</h2>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Left Headers</h3>
+        <table th:if="${!#lists.isEmpty(leftRequest.headers)}">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="header : ${leftRequest.headers}">
+                <td th:text="${header.headerName}"></td>
+                <td th:text="${header.headerValue}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(leftRequest.headers)}" class="empty">No headers</p>
+    </div>
+
+    <div class="card">
+        <h3>Right Headers</h3>
+        <table th:if="${!#lists.isEmpty(rightRequest.headers)}">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="header : ${rightRequest.headers}">
+                <td th:text="${header.headerName}"></td>
+                <td th:text="${header.headerValue}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(rightRequest.headers)}" class="empty">No headers</p>
+    </div>
+</div>
+
+<h2>All Query Params</h2>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Left Query Params</h3>
+        <table th:if="${!#lists.isEmpty(leftRequest.queryParams)}">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="qp : ${leftRequest.queryParams}">
+                <td th:text="${qp.paramName}"></td>
+                <td th:text="${qp.paramValue}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(leftRequest.queryParams)}" class="empty">No query params</p>
+    </div>
+
+    <div class="card">
+        <h3>Right Query Params</h3>
+        <table th:if="${!#lists.isEmpty(rightRequest.queryParams)}">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="qp : ${rightRequest.queryParams}">
+                <td th:text="${qp.paramName}"></td>
+                <td th:text="${qp.paramValue}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(rightRequest.queryParams)}" class="empty">No query params</p>
+    </div>
+</div>
+
+<h2>All Body Fields</h2>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Left Body Fields</h3>
+        <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
+            <thead>
+            <tr>
+                <th>Field Path</th>
+                <th>Value</th>
+                <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="field : ${leftRequest.bodyFields}">
+                <td th:text="${field.fieldPath}"></td>
+                <td th:text="${field.fieldValue}"></td>
+                <td th:text="${field.valueType}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No body fields</p>
+    </div>
+
+    <div class="card">
+        <h3>Right Body Fields</h3>
+        <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
+            <thead>
+            <tr>
+                <th>Field Path</th>
+                <th>Value</th>
+                <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="field : ${rightRequest.bodyFields}">
+                <td th:text="${field.fieldPath}"></td>
+                <td th:text="${field.fieldValue}"></td>
+                <td th:text="${field.valueType}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No body fields</p>
+    </div>
+</div>
+
+<h2>Difference Lists</h2>
+
+<div class="grid-2">
+    <div class="card diff-card">
+        <h3>Headers Only In Left</h3>
+        <ul th:if="${!#lists.isEmpty(compareResult.headersOnlyInLeft)}">
+            <li th:each="item : ${compareResult.headersOnlyInLeft}" th:text="${item}"></li>
+        </ul>
+        <p th:if="${#lists.isEmpty(compareResult.headersOnlyInLeft)}" class="empty">None</p>
+    </div>
+
+    <div class="card diff-card">
+        <h3>Headers Only In Right</h3>
+        <ul th:if="${!#lists.isEmpty(compareResult.headersOnlyInRight)}">
+            <li th:each="item : ${compareResult.headersOnlyInRight}" th:text="${item}"></li>
+        </ul>
+        <p th:if="${#lists.isEmpty(compareResult.headersOnlyInRight)}" class="empty">None</p>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card diff-card">
+        <h3>Query Params Only In Left</h3>
+        <ul th:if="${!#lists.isEmpty(compareResult.queryParamsOnlyInLeft)}">
+            <li th:each="item : ${compareResult.queryParamsOnlyInLeft}" th:text="${item}"></li>
+        </ul>
+        <p th:if="${#lists.isEmpty(compareResult.queryParamsOnlyInLeft)}" class="empty">None</p>
+    </div>
+
+    <div class="card diff-card">
+        <h3>Query Params Only In Right</h3>
+        <ul th:if="${!#lists.isEmpty(compareResult.queryParamsOnlyInRight)}">
+            <li th:each="item : ${compareResult.queryParamsOnlyInRight}" th:text="${item}"></li>
+        </ul>
+        <p th:if="${#lists.isEmpty(compareResult.queryParamsOnlyInRight)}" class="empty">None</p>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card diff-card">
+        <h3>Body Fields Only In Left</h3>
+        <ul th:if="${!#lists.isEmpty(compareResult.bodyFieldsOnlyInLeft)}">
+            <li th:each="item : ${compareResult.bodyFieldsOnlyInLeft}" th:text="${item}"></li>
+        </ul>
+        <p th:if="${#lists.isEmpty(compareResult.bodyFieldsOnlyInLeft)}" class="empty">None</p>
+    </div>
+
+    <div class="card diff-card">
+        <h3>Body Fields Only In Right</h3>
+        <ul th:if="${!#lists.isEmpty(compareResult.bodyFieldsOnlyInRight)}">
+            <li th:each="item : ${compareResult.bodyFieldsOnlyInRight}" th:text="${item}"></li>
+        </ul>
+        <p th:if="${#lists.isEmpty(compareResult.bodyFieldsOnlyInRight)}" class="empty">None</p>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Body Type Mismatches</h3>
+
+    <table th:if="${!#lists.isEmpty(compareResult.bodyTypeMismatches)}">
+        <thead>
+        <tr>
+            <th>Field Path</th>
+            <th>Left Type</th>
+            <th>Right Type</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${compareResult.bodyTypeMismatches}">
+            <td th:text="${item.fieldPath}"></td>
+            <td th:text="${item.leftType}"></td>
+            <td th:text="${item.rightType}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${#lists.isEmpty(compareResult.bodyTypeMismatches)}" class="empty">None</p>
+</div>
+
+<h2>Payload View</h2>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Left Raw Body</h3>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${leftRawBodyFormatted}"></pre>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and (leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or leftRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${leftRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.fieldValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No body</p>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${leftRequest.bodyRaw != null ? leftRequest.bodyRaw : 'No body'}"></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Right Raw Body</h3>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${rightRawBodyFormatted}"></pre>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and (rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or rightRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${rightRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.fieldValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No body</p>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${rightRequest.bodyRaw != null ? rightRequest.bodyRaw : 'No body'}"></pre>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Left Normalized Structure</h3>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${leftNormalizedStructureFormatted}"></pre>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and (leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or leftRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${leftRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.valueType}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No normalized structure</p>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${leftRequest.normalizedStructureJson != null ? leftRequest.normalizedStructureJson : '{}'}"></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Right Normalized Structure</h3>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${rightNormalizedStructureFormatted}"></pre>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and (rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or rightRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${rightRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.valueType}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No normalized structure</p>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${rightRequest.normalizedStructureJson != null ? rightRequest.normalizedStructureJson : '{}'}"></pre>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
