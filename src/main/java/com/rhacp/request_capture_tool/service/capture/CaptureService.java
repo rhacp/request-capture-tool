@@ -1,4 +1,4 @@
-package com.rhacp.request_capture_tool.service;
+package com.rhacp.request_capture_tool.service.capture;
 
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;

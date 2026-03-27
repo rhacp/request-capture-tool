@@ -2,6 +2,7 @@ package com.rhacp.request_capture_tool.service;
 
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
 import com.rhacp.request_capture_tool.repository.CapturedRequestRepository;
+import com.rhacp.request_capture_tool.service.capture.CaptureService;
 import com.rhacp.request_capture_tool.util.enumeration.ContentTypeCategory;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
 import org.junit.jupiter.api.DisplayName;

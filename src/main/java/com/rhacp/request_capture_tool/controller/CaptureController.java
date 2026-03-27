@@ -1,7 +1,7 @@
 package com.rhacp.request_capture_tool.controller;
 
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
-import com.rhacp.request_capture_tool.service.CaptureService;
+import com.rhacp.request_capture_tool.service.capture.CaptureService;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;

@@ -3,7 +3,6 @@ package com.rhacp.request_capture_tool.repository;
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
 import com.rhacp.request_capture_tool.util.enumeration.ContentTypeCategory;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

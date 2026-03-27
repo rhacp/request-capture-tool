@@ -1,7 +1,8 @@
 package com.rhacp.request_capture_tool.controller;
 
 import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
-import com.rhacp.request_capture_tool.service.RequestViewService;
+import com.rhacp.request_capture_tool.service.view.RequestFormattingService;
+import com.rhacp.request_capture_tool.service.view.RequestViewService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,8 +16,14 @@ public class RequestViewController {
 
     private final RequestViewService requestViewService;
 
-    public RequestViewController(RequestViewService requestViewService) {
+    private final RequestFormattingService formattingService;
+
+    public RequestViewController(
+            RequestViewService requestViewService,
+            RequestFormattingService formattingService
+    ) {
         this.requestViewService = requestViewService;
+        this.formattingService = formattingService;
     }
 
     @GetMapping
@@ -40,7 +47,12 @@ public class RequestViewController {
 
     @GetMapping("/{id}")
     public String requestDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("requestItem", requestViewService.getRequestDetails(id));
+        RequestDetailsView requestItem = requestViewService.getRequestDetails(id);
+
+        model.addAttribute("requestItem", requestItem);
+        model.addAttribute("formattedRawBody", formattingService.formatRawBodyForDisplay(requestItem));
+        model.addAttribute("formattedDecodedBody", formattingService.formatDecodedBody(requestItem));
+
         return "request-details";
     }
 

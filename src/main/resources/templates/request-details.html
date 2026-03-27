@@ -24,6 +24,49 @@
             border-radius: 10px;
         }
 
+        .payload-meta {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #161616;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+        }
+
+        .payload-meta p {
+            margin: 6px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #3a3a3a;
+            background: #232323;
+            color: #e6e6e6;
+        }
+
+        .badge-json {
+            border-color: #1e88e5;
+            color: #90caf9;
+        }
+
+        .badge-form {
+            border-color: #8e24aa;
+            color: #ce93d8;
+        }
+
+        .badge-multipart {
+            border-color: #fb8c00;
+            color: #ffcc80;
+        }
+
+        .badge-unknown {
+            border-color: #616161;
+            color: #bdbdbd;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -52,6 +95,8 @@
             padding: 12px;
             border-radius: 8px;
             overflow-x: auto;
+            font-size: 16px;
+            line-height: 1.6;
         }
 
         a {
@@ -61,23 +106,6 @@
 
         a:hover {
             text-decoration: underline;
-        }
-
-        form {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
-        input[type="text"],
-        input[type="number"] {
-            padding: 8px;
-            min-width: 160px;
-            background: #181818;
-            color: #e6e6e6;
-            border: 1px solid #333333;
-            border-radius: 6px;
         }
 
         button {
@@ -162,11 +190,43 @@
     </tbody>
 </table>
 
-<h2>Raw Body</h2>
-<pre th:text="${requestItem.bodyRaw}"></pre>
+<h2>Payload View</h2>
 
-<h2>Normalized Structure JSON</h2>
-<pre th:text="${requestItem.normalizedStructureJson}"></pre>
+<div class="card">
+    <div class="payload-meta">
+        <p><strong>Content Type Category:</strong> <span th:text="${requestItem.contentTypeCategory}"></span></p>
+        <p><strong>Content Type:</strong> <span th:text="${requestItem.contentType != null ? requestItem.contentType : '-'}"></span></p>
+        <p>
+            <strong>Decoded As:</strong>
+
+            <span class="badge badge-json"
+                  th:if="${requestItem.contentTypeCategory != null and requestItem.contentTypeCategory.name() == 'JSON'}">
+                Pretty JSON
+            </span>
+
+            <span class="badge badge-form"
+                  th:if="${requestItem.contentTypeCategory != null and requestItem.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                Decoded form fields
+            </span>
+
+            <span class="badge badge-multipart"
+                  th:if="${requestItem.contentTypeCategory != null and requestItem.contentTypeCategory.name() == 'MULTIPART'}">
+                Multipart fields
+            </span>
+
+            <span class="badge badge-unknown"
+                  th:if="${requestItem.contentTypeCategory == null or requestItem.contentTypeCategory.name() == 'UNKNOWN'}">
+                Raw text
+            </span>
+        </p>
+    </div>
+
+    <h3>Raw Body</h3>
+    <pre th:text="${formattedRawBody}"></pre>
+
+    <h3>Decoded Body</h3>
+    <pre th:text="${formattedDecodedBody}"></pre>
+</div>
 
 </body>
 </html>

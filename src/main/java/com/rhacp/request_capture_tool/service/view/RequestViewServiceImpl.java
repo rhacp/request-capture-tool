@@ -1,4 +1,4 @@
-package com.rhacp.request_capture_tool.service;
+package com.rhacp.request_capture_tool.service.view;
 
 import com.rhacp.request_capture_tool.model.dto.BodyFieldItemView;
 import com.rhacp.request_capture_tool.model.dto.HeaderItemView;
@@ -20,8 +20,11 @@ import java.util.List;
 public class RequestViewServiceImpl implements RequestViewService {
 
     private final CapturedRequestRepository capturedRequestRepository;
+
     private final CapturedHeaderRepository capturedHeaderRepository;
+
     private final CapturedQueryParamRepository capturedQueryParamRepository;
+
     private final CapturedBodyFieldRepository capturedBodyFieldRepository;
 
     public RequestViewServiceImpl(

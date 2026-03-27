@@ -1,4 +1,4 @@
-package com.rhacp.request_capture_tool.service;
+package com.rhacp.request_capture_tool.service.capture;
 
 import com.rhacp.request_capture_tool.model.entity.CapturedHeader;
 import com.rhacp.request_capture_tool.model.entity.CapturedQueryParam;
@@ -20,6 +20,7 @@ import java.util.Locale;
 public class CaptureServiceImpl implements CaptureService {
 
     private final CapturedRequestRepository capturedRequestRepository;
+
     private final NormalizationService normalizationService;
 
     public CaptureServiceImpl(

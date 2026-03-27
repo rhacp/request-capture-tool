@@ -1,4 +1,4 @@
-package com.rhacp.request_capture_tool.service;
+package com.rhacp.request_capture_tool.service.compare;
 
 import com.rhacp.request_capture_tool.model.dto.BodyFieldItemView;
 import com.rhacp.request_capture_tool.model.dto.BodyFieldTypeMismatchView;
@@ -6,6 +6,8 @@ import com.rhacp.request_capture_tool.model.dto.CompareResultView;
 import com.rhacp.request_capture_tool.model.dto.HeaderItemView;
 import com.rhacp.request_capture_tool.model.dto.QueryParamItemView;
 import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
+import com.rhacp.request_capture_tool.service.common.HeaderIgnoreService;
+import com.rhacp.request_capture_tool.service.view.RequestViewService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import java.util.*;
 public class CompareServiceImpl implements CompareService {
 
     private final RequestViewService requestViewService;
+
     private final HeaderIgnoreService headerIgnoreService;
 
     public CompareServiceImpl(
@@ -99,7 +102,7 @@ public class CompareServiceImpl implements CompareService {
                 safeEnumName(left.contentTypeCategory()),
                 safeEnumName(right.contentTypeCategory()),
 
-                buildIgnoredHeaderRules(),
+                headerIgnoreService.getIgnoreRules(),
 
                 headersOnlyInLeft,
                 headersOnlyInRight,
@@ -239,29 +242,6 @@ public class CompareServiceImpl implements CompareService {
         }
 
         return result;
-    }
-
-    private List<String> buildIgnoredHeaderRules() {
-        return List.of(
-                "content-length",
-                "host",
-                "user-agent",
-                "date",
-                "x-forwarded-for",
-                "x-forwarded-host",
-                "x-forwarded-port",
-                "x-forwarded-proto",
-                "forwarded",
-                "postman-token",
-                "connection",
-                "accept-encoding",
-                "x-b3-*",
-                "x-amzn-trace-id",
-                "cf-*",
-                "traceparent",
-                "tracestate",
-                "baggage"
-        );
     }
 
     private int countMetadataMismatches(

@@ -1,4 +1,4 @@
-package com.rhacp.request_capture_tool.service;
+package com.rhacp.request_capture_tool.service.compare;
 
 import com.rhacp.request_capture_tool.model.dto.CompareResultView;
 
