@@ -4,6 +4,10 @@
     <title>Compare Requests</title>
     <meta charset="UTF-8">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             margin: 24px;
@@ -22,6 +26,8 @@
             padding: 18px;
             margin-bottom: 20px;
             border-radius: 10px;
+            min-width: 0;
+            overflow: hidden;
         }
 
         .summary-card {
@@ -53,8 +59,13 @@
 
         .grid-2 {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
             gap: 20px;
+            align-items: start;
+        }
+
+        .grid-2 > * {
+            min-width: 0;
         }
 
         .request-panel {
@@ -62,6 +73,7 @@
             border: 1px solid #2e2e2e;
             border-radius: 10px;
             padding: 16px;
+            min-width: 0;
         }
 
         .request-panel.left {
@@ -80,6 +92,14 @@
 
         .request-meta p {
             margin: 6px 0;
+            word-break: break-word;
+        }
+
+        .table-wrapper,
+        .pre-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            min-width: 0;
         }
 
         table {
@@ -87,6 +107,7 @@
             border-collapse: collapse;
             background: #1b1b1b;
             border: 1px solid #2d2d2d;
+            table-layout: fixed;
         }
 
         th, td {
@@ -94,6 +115,8 @@
             padding: 10px;
             text-align: left;
             vertical-align: top;
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         th {
@@ -107,11 +130,13 @@
 
         li {
             margin-bottom: 4px;
+            word-break: break-word;
         }
 
         pre {
             white-space: pre-wrap;
             word-break: break-word;
+            overflow-wrap: anywhere;
             background: #101010;
             color: #e6e6e6;
             border: 1px solid #2d2d2d;
@@ -121,6 +146,7 @@
             overflow-x: auto;
             font-size: 16px;
             line-height: 1.6;
+            margin: 0;
         }
 
         a {
@@ -159,10 +185,12 @@
             background: #161616;
             border: 1px solid #2d2d2d;
             border-radius: 8px;
+            min-width: 0;
         }
 
         .payload-meta p {
             margin: 6px 0;
+            word-break: break-word;
         }
 
         .badge {
@@ -194,6 +222,12 @@
         .badge-unknown {
             border-color: #616161;
             color: #bdbdbd;
+        }
+
+        @media (max-width: 1100px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -265,45 +299,47 @@
 <h2>Metadata Comparison</h2>
 
 <div class="card">
-    <table>
-        <thead>
-        <tr>
-            <th>Field</th>
-            <th>Left</th>
-            <th>Right</th>
-            <th>Status</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td>Method</td>
-            <td th:text="${compareResult.leftMethod}"></td>
-            <td th:text="${compareResult.rightMethod}"></td>
-            <td>
-                <span th:if="${compareResult.sameMethod}" class="ok">MATCH</span>
-                <span th:unless="${compareResult.sameMethod}" class="not-ok">MISMATCH</span>
-            </td>
-        </tr>
-        <tr>
-            <td>Source Type</td>
-            <td th:text="${compareResult.leftSourceType}"></td>
-            <td th:text="${compareResult.rightSourceType}"></td>
-            <td>
-                <span th:if="${compareResult.sameSourceType}" class="ok">MATCH</span>
-                <span th:unless="${compareResult.sameSourceType}" class="not-ok">MISMATCH</span>
-            </td>
-        </tr>
-        <tr>
-            <td>Content Type Category</td>
-            <td th:text="${compareResult.leftContentTypeCategory}"></td>
-            <td th:text="${compareResult.rightContentTypeCategory}"></td>
-            <td>
-                <span th:if="${compareResult.sameContentTypeCategory}" class="ok">MATCH</span>
-                <span th:unless="${compareResult.sameContentTypeCategory}" class="not-ok">MISMATCH</span>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+            <tr>
+                <th>Field</th>
+                <th>Left</th>
+                <th>Right</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Method</td>
+                <td th:text="${compareResult.leftMethod}"></td>
+                <td th:text="${compareResult.rightMethod}"></td>
+                <td>
+                    <span th:if="${compareResult.sameMethod}" class="ok">MATCH</span>
+                    <span th:unless="${compareResult.sameMethod}" class="not-ok">MISMATCH</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Source Type</td>
+                <td th:text="${compareResult.leftSourceType}"></td>
+                <td th:text="${compareResult.rightSourceType}"></td>
+                <td>
+                    <span th:if="${compareResult.sameSourceType}" class="ok">MATCH</span>
+                    <span th:unless="${compareResult.sameSourceType}" class="not-ok">MISMATCH</span>
+                </td>
+            </tr>
+            <tr>
+                <td>Content Type Category</td>
+                <td th:text="${compareResult.leftContentTypeCategory}"></td>
+                <td th:text="${compareResult.rightContentTypeCategory}"></td>
+                <td>
+                    <span th:if="${compareResult.sameContentTypeCategory}" class="ok">MATCH</span>
+                    <span th:unless="${compareResult.sameContentTypeCategory}" class="not-ok">MISMATCH</span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <h2>All Headers</h2>
@@ -311,39 +347,43 @@
 <div class="grid-2">
     <div class="card">
         <h3>Left Headers</h3>
-        <table th:if="${!#lists.isEmpty(leftRequest.headers)}">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="header : ${leftRequest.headers}">
-                <td th:text="${header.headerName}"></td>
-                <td th:text="${header.headerValue}"></td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(leftRequest.headers)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="header : ${leftRequest.headers}">
+                    <td th:text="${header.headerName}"></td>
+                    <td th:text="${header.headerValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <p th:if="${#lists.isEmpty(leftRequest.headers)}" class="empty">No headers</p>
     </div>
 
     <div class="card">
         <h3>Right Headers</h3>
-        <table th:if="${!#lists.isEmpty(rightRequest.headers)}">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="header : ${rightRequest.headers}">
-                <td th:text="${header.headerName}"></td>
-                <td th:text="${header.headerValue}"></td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(rightRequest.headers)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="header : ${rightRequest.headers}">
+                    <td th:text="${header.headerName}"></td>
+                    <td th:text="${header.headerValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <p th:if="${#lists.isEmpty(rightRequest.headers)}" class="empty">No headers</p>
     </div>
 </div>
@@ -353,39 +393,43 @@
 <div class="grid-2">
     <div class="card">
         <h3>Left Query Params</h3>
-        <table th:if="${!#lists.isEmpty(leftRequest.queryParams)}">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="qp : ${leftRequest.queryParams}">
-                <td th:text="${qp.paramName}"></td>
-                <td th:text="${qp.paramValue}"></td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(leftRequest.queryParams)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="qp : ${leftRequest.queryParams}">
+                    <td th:text="${qp.paramName}"></td>
+                    <td th:text="${qp.paramValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <p th:if="${#lists.isEmpty(leftRequest.queryParams)}" class="empty">No query params</p>
     </div>
 
     <div class="card">
         <h3>Right Query Params</h3>
-        <table th:if="${!#lists.isEmpty(rightRequest.queryParams)}">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="qp : ${rightRequest.queryParams}">
-                <td th:text="${qp.paramName}"></td>
-                <td th:text="${qp.paramValue}"></td>
-            </tr>
-            </tbody>
-        </table>
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(rightRequest.queryParams)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="qp : ${rightRequest.queryParams}">
+                    <td th:text="${qp.paramName}"></td>
+                    <td th:text="${qp.paramValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <p th:if="${#lists.isEmpty(rightRequest.queryParams)}" class="empty">No query params</p>
     </div>
 </div>
@@ -399,26 +443,45 @@
         <div class="payload-meta">
             <p><strong>Content Type Category:</strong> <span th:text="${leftRequest.contentTypeCategory}"></span></p>
             <p><strong>Content Type:</strong> <span th:text="${leftRequest.contentType}"></span></p>
-            <p><strong>Rendered As:</strong> <span class="badge badge-form">Decoded form body</span></p>
+            <p>
+                <strong>Rendered As:</strong>
+                <span class="badge badge-json"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+                    Pretty JSON
+                </span>
+                <span class="badge badge-form"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                    Decoded form body
+                </span>
+                <span class="badge badge-multipart"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'MULTIPART'}">
+                    Multipart preview
+                </span>
+                <span class="badge badge-unknown"
+                      th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+                    Raw text
+                </span>
+            </p>
         </div>
 
-        <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
-            <thead>
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-                <th>Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="field : ${leftRequest.bodyFields}">
-                <td th:text="${field.fieldPath}"></td>
-                <td th:text="${field.fieldValue}"></td>
-                <td th:text="${field.valueType}"></td>
-            </tr>
-            </tbody>
-        </table>
-
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${leftRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.fieldValue}"></td>
+                    <td th:text="${field.valueType}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No body</p>
     </div>
 
@@ -428,26 +491,45 @@
         <div class="payload-meta">
             <p><strong>Content Type Category:</strong> <span th:text="${rightRequest.contentTypeCategory}"></span></p>
             <p><strong>Content Type:</strong> <span th:text="${rightRequest.contentType}"></span></p>
-            <p><strong>Rendered As:</strong> <span class="badge badge-json">Pretty JSON</span></p>
+            <p>
+                <strong>Rendered As:</strong>
+                <span class="badge badge-json"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+                    Pretty JSON
+                </span>
+                <span class="badge badge-form"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                    Decoded form body
+                </span>
+                <span class="badge badge-multipart"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'MULTIPART'}">
+                    Multipart preview
+                </span>
+                <span class="badge badge-unknown"
+                      th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+                    Raw text
+                </span>
+            </p>
         </div>
 
-        <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
-            <thead>
-            <tr>
-                <th>Field</th>
-                <th>Value</th>
-                <th>Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="field : ${rightRequest.bodyFields}">
-                <td th:text="${field.fieldPath}"></td>
-                <td th:text="${field.fieldValue}"></td>
-                <td th:text="${field.valueType}"></td>
-            </tr>
-            </tbody>
-        </table>
-
+        <div class="table-wrapper" th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${rightRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.fieldValue}"></td>
+                    <td th:text="${field.valueType}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
         <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No body</p>
     </div>
 </div>
@@ -455,12 +537,16 @@
 <div class="grid-2">
     <div class="card">
         <h3>Left Body Preview</h3>
-        <pre th:text="${leftBodyPreview}"></pre>
+        <div class="pre-wrapper">
+            <pre th:text="${leftBodyPreview}"></pre>
+        </div>
     </div>
 
     <div class="card">
         <h3>Right Body Preview</h3>
-        <pre th:text="${rightBodyPreview}"></pre>
+        <div class="pre-wrapper">
+            <pre th:text="${rightBodyPreview}"></pre>
+        </div>
     </div>
 </div>
 
@@ -523,22 +609,24 @@
 <div class="card">
     <h3>Body Type Mismatches</h3>
 
-    <table th:if="${!#lists.isEmpty(compareResult.bodyTypeMismatches)}">
-        <thead>
-        <tr>
-            <th>Field Path</th>
-            <th>Left Type</th>
-            <th>Right Type</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="item : ${compareResult.bodyTypeMismatches}">
-            <td th:text="${item.fieldPath}"></td>
-            <td th:text="${item.leftType}"></td>
-            <td th:text="${item.rightType}"></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="table-wrapper" th:if="${!#lists.isEmpty(compareResult.bodyTypeMismatches)}">
+        <table>
+            <thead>
+            <tr>
+                <th>Field Path</th>
+                <th>Left Type</th>
+                <th>Right Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="item : ${compareResult.bodyTypeMismatches}">
+                <td th:text="${item.fieldPath}"></td>
+                <td th:text="${item.leftType}"></td>
+                <td th:text="${item.rightType}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 
     <p th:if="${#lists.isEmpty(compareResult.bodyTypeMismatches)}" class="empty">None</p>
 </div>
