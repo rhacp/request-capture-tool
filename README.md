@@ -24,19 +24,6 @@ A lightweight Spring Boot tool for capturing and inspecting incoming HTTP reques
 
 ---
 
-## Tech stack
-
-* Java 21
-* Spring Boot 4
-* Spring Web
-* Spring Data JPA
-* Thymeleaf
-* H2 Database (file-based)
-* Lombok
-* Maven
-
----
-
 ## Run the Project
 
 1. Download the repository and unzip it.
@@ -99,3 +86,17 @@ http://localhost:8080/capture/webhook/test-group
 ```
 
 ---
+
+## Tech stack
+
+* Java 21
+* Spring Boot 4
+* Spring Web
+* Spring Data JPA
+* Thymeleaf
+* H2 Database (file-based)
+* Lombok
+* Maven
+
+---
+
