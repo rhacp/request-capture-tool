@@ -4,11 +4,11 @@ import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
 import com.rhacp.request_capture_tool.service.CaptureService;
 import com.rhacp.request_capture_tool.util.enumeration.ContentTypeCategory;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -39,7 +40,7 @@ class CaptureControllerTest {
                 .sourceType(SourceType.BACKURL)
                 .groupName("test-group")
                 .method("GET")
-                .path("/capture/backurl/test-group?status=SUCCESS")
+                .path("/capture/backurl/test-group")
                 .contentTypeCategory(ContentTypeCategory.UNKNOWN)
                 .build();
 
@@ -50,9 +51,11 @@ class CaptureControllerTest {
                         .queryParam("status", "SUCCESS"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("text/html"))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("BackUrl request captured successfully")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Capture ID:")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("test-group")));
+                .andExpect(content().string(containsString("BackUrl GET captured successfully")))
+                .andExpect(content().string(containsString("Capture ID:")))
+                .andExpect(content().string(containsString("test-group")))
+                .andExpect(content().string(containsString("/ui/requests/1")))
+                .andExpect(content().string(containsString("/ui/requests")));
     }
 
     @Test
@@ -76,8 +79,9 @@ class CaptureControllerTest {
                         .content("{\"status\":\"SUCCESS\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith("text/plain"))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("Webhook captured successfully")))
-                .andExpect(content().string(org.hamcrest.Matchers.containsString("2")));
+                .andExpect(content().string(containsString("Webhook captured successfully")))
+                .andExpect(content().string(containsString("Capture ID: 2")))
+                .andExpect(content().string(containsString("Group: webhook-group")));
     }
 
     @Test
@@ -97,6 +101,9 @@ class CaptureControllerTest {
                 .thenReturn(saved);
 
         mockMvc.perform(get("/capture/webhook/health-check"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith("text/plain"))
+                .andExpect(content().string(containsString("Webhook GET received successfully")))
+                .andExpect(content().string(containsString("Capture ID: 3")));
     }
 }

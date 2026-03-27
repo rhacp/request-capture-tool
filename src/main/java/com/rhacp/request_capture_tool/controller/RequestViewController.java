@@ -2,6 +2,7 @@ package com.rhacp.request_capture_tool.controller;
 
 import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
 import com.rhacp.request_capture_tool.service.RequestViewService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,27 +20,48 @@ public class RequestViewController {
     }
 
     @GetMapping
-    public String listRequests(
+    public String getRequests(
             @RequestParam(required = false) String group,
+            HttpServletRequest request,
             Model model
     ) {
-        List<RequestDetailsView> requests;
+        String baseUrl = getBaseUrl(request);
+        model.addAttribute("baseUrl", baseUrl);
 
-        if (group != null && !group.isBlank()) {
-            requests = requestViewService.getRequestsByGroup(group.trim());
-        } else {
-            requests = requestViewService.getAllRequests();
-        }
+        List<RequestDetailsView> requests = (group != null && !group.isBlank())
+                ? requestViewService.getRequestsByGroup(group)
+                : requestViewService.getAllRequests();
 
         model.addAttribute("requests", requests);
         model.addAttribute("selectedGroup", group);
 
-        return "requests-list";
+        return "requests";
     }
 
     @GetMapping("/{id}")
     public String requestDetails(@PathVariable Long id, Model model) {
         model.addAttribute("requestItem", requestViewService.getRequestDetails(id));
         return "request-details";
+    }
+
+    private String getBaseUrl(HttpServletRequest request) {
+        String scheme = request.getHeader("X-Forwarded-Proto");
+        if (scheme == null || scheme.isBlank()) {
+            scheme = request.getScheme();
+        }
+
+        String host = request.getHeader("X-Forwarded-Host");
+        if (host == null || host.isBlank()) {
+            host = request.getServerName();
+        }
+
+        String portHeader = request.getHeader("X-Forwarded-Port");
+        int port = portHeader != null ? Integer.parseInt(portHeader) : request.getServerPort();
+
+        boolean isDefaultPort =
+                ("http".equalsIgnoreCase(scheme) && port == 80) ||
+                        ("https".equalsIgnoreCase(scheme) && port == 443);
+
+        return scheme + "://" + host + (isDefaultPort ? "" : ":" + port);
     }
 }
