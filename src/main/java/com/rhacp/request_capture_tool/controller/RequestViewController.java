@@ -40,7 +40,7 @@ public class RequestViewController {
                 : requestViewService.getAllRequests();
 
         model.addAttribute("requests", requests);
-        model.addAttribute("selectedGroup", group);
+        model.addAttribute("selectedGroup", group != null && !group.isBlank() ? group : "{groupName}");
 
         return "requests-list";
     }
