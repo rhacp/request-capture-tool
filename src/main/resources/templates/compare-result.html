@@ -119,6 +119,7 @@
             border-radius: 8px;
             min-height: 120px;
             overflow-x: auto;
+            font-size: 16px;
         }
 
         a {
@@ -149,6 +150,49 @@
 
         .top-space {
             margin-top: 8px;
+        }
+
+        .payload-meta {
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #161616;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+        }
+
+        .payload-meta p {
+            margin: 6px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: bold;
+            border: 1px solid #3a3a3a;
+            background: #232323;
+            color: #e6e6e6;
+        }
+
+        .badge-json {
+            border-color: #1e88e5;
+            color: #90caf9;
+        }
+
+        .badge-form {
+            border-color: #8e24aa;
+            color: #ce93d8;
+        }
+
+        .badge-multipart {
+            border-color: #fb8c00;
+            color: #ffcc80;
+        }
+
+        .badge-unknown {
+            border-color: #616161;
+            color: #bdbdbd;
         }
     </style>
 </head>
@@ -345,49 +389,223 @@
     </div>
 </div>
 
-<h2>All Body Fields</h2>
+<h2>Payload View</h2>
 
 <div class="grid-2">
     <div class="card">
-        <h3>Left Body Fields</h3>
-        <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
-            <thead>
-            <tr>
-                <th>Field Path</th>
-                <th>Value</th>
-                <th>Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="field : ${leftRequest.bodyFields}">
-                <td th:text="${field.fieldPath}"></td>
-                <td th:text="${field.fieldValue}"></td>
-                <td th:text="${field.valueType}"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No body fields</p>
+        <h3>Left Raw Body</h3>
+
+        <div class="payload-meta">
+            <p><strong>Content Type Category:</strong> <span th:text="${leftRequest.contentTypeCategory}"></span></p>
+            <p><strong>Content Type:</strong> <span th:text="${leftRequest.contentType != null ? leftRequest.contentType : '-'}"></span></p>
+            <p>
+                <strong>Rendered As:</strong>
+                <span class="badge badge-json"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+                    Pretty JSON
+                </span>
+                <span class="badge badge-form"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                    Form fields
+                </span>
+                <span class="badge badge-multipart"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'MULTIPART'}">
+                    Multipart fields
+                </span>
+                <span class="badge badge-unknown"
+                      th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+                    Raw text
+                </span>
+            </p>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${leftRawBodyFormatted}"></pre>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and (leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or leftRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${leftRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.fieldValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No body</p>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${leftRequest.bodyRaw != null ? leftRequest.bodyRaw : 'No body'}"></pre>
+        </div>
     </div>
 
     <div class="card">
-        <h3>Right Body Fields</h3>
-        <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
-            <thead>
-            <tr>
-                <th>Field Path</th>
-                <th>Value</th>
-                <th>Type</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="field : ${rightRequest.bodyFields}">
-                <td th:text="${field.fieldPath}"></td>
-                <td th:text="${field.fieldValue}"></td>
-                <td th:text="${field.valueType}"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No body fields</p>
+        <h3>Right Raw Body</h3>
+
+        <div class="payload-meta">
+            <p><strong>Content Type Category:</strong> <span th:text="${rightRequest.contentTypeCategory}"></span></p>
+            <p><strong>Content Type:</strong> <span th:text="${rightRequest.contentType != null ? rightRequest.contentType : '-'}"></span></p>
+            <p>
+                <strong>Rendered As:</strong>
+                <span class="badge badge-json"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+                    Pretty JSON
+                </span>
+                <span class="badge badge-form"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                    Form fields
+                </span>
+                <span class="badge badge-multipart"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'MULTIPART'}">
+                    Multipart fields
+                </span>
+                <span class="badge badge-unknown"
+                      th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+                    Raw text
+                </span>
+            </p>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${rightRawBodyFormatted}"></pre>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and (rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or rightRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${rightRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.fieldValue}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No body</p>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${rightRequest.bodyRaw != null ? rightRequest.bodyRaw : 'No body'}"></pre>
+        </div>
+    </div>
+</div>
+
+<div class="grid-2">
+    <div class="card">
+        <h3>Left Normalized Structure</h3>
+
+        <div class="payload-meta">
+            <p><strong>Content Type Category:</strong> <span th:text="${leftRequest.contentTypeCategory}"></span></p>
+            <p>
+                <strong>Rendered As:</strong>
+                <span class="badge badge-json"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+                    Pretty JSON
+                </span>
+                <span class="badge badge-form"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                    Field structure
+                </span>
+                <span class="badge badge-multipart"
+                      th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'MULTIPART'}">
+                    Multipart structure
+                </span>
+                <span class="badge badge-unknown"
+                      th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+                    Raw text
+                </span>
+            </p>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${leftNormalizedStructureFormatted}"></pre>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory != null and (leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or leftRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${leftRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.valueType}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No normalized structure</p>
+        </div>
+
+        <div th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${leftRequest.normalizedStructureJson != null ? leftRequest.normalizedStructureJson : '{}'}"></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Right Normalized Structure</h3>
+
+        <div class="payload-meta">
+            <p><strong>Content Type Category:</strong> <span th:text="${rightRequest.contentTypeCategory}"></span></p>
+            <p>
+                <strong>Rendered As:</strong>
+                <span class="badge badge-json"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+                    Pretty JSON
+                </span>
+                <span class="badge badge-form"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED'}">
+                    Field structure
+                </span>
+                <span class="badge badge-multipart"
+                      th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'MULTIPART'}">
+                    Multipart structure
+                </span>
+                <span class="badge badge-unknown"
+                      th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+                    Raw text
+                </span>
+            </p>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
+            <pre th:text="${rightNormalizedStructureFormatted}"></pre>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory != null and (rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or rightRequest.contentTypeCategory.name() == 'MULTIPART')}">
+            <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
+                <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Type</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="field : ${rightRequest.bodyFields}">
+                    <td th:text="${field.fieldPath}"></td>
+                    <td th:text="${field.valueType}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No normalized structure</p>
+        </div>
+
+        <div th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
+            <pre th:text="${rightRequest.normalizedStructureJson != null ? rightRequest.normalizedStructureJson : '{}'}"></pre>
+        </div>
     </div>
 </div>
 
@@ -468,132 +686,6 @@
     </table>
 
     <p th:if="${#lists.isEmpty(compareResult.bodyTypeMismatches)}" class="empty">None</p>
-</div>
-
-<h2>Payload View</h2>
-
-<div class="grid-2">
-    <div class="card">
-        <h3>Left Raw Body</h3>
-
-        <div th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
-            <pre th:text="${leftRawBodyFormatted}"></pre>
-        </div>
-
-        <div th:if="${leftRequest.contentTypeCategory != null and (leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or leftRequest.contentTypeCategory.name() == 'MULTIPART')}">
-            <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="field : ${leftRequest.bodyFields}">
-                    <td th:text="${field.fieldPath}"></td>
-                    <td th:text="${field.fieldValue}"></td>
-                </tr>
-                </tbody>
-            </table>
-            <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No body</p>
-        </div>
-
-        <div th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
-            <pre th:text="${leftRequest.bodyRaw != null ? leftRequest.bodyRaw : 'No body'}"></pre>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Right Raw Body</h3>
-
-        <div th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
-            <pre th:text="${rightRawBodyFormatted}"></pre>
-        </div>
-
-        <div th:if="${rightRequest.contentTypeCategory != null and (rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or rightRequest.contentTypeCategory.name() == 'MULTIPART')}">
-            <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="field : ${rightRequest.bodyFields}">
-                    <td th:text="${field.fieldPath}"></td>
-                    <td th:text="${field.fieldValue}"></td>
-                </tr>
-                </tbody>
-            </table>
-            <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No body</p>
-        </div>
-
-        <div th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
-            <pre th:text="${rightRequest.bodyRaw != null ? rightRequest.bodyRaw : 'No body'}"></pre>
-        </div>
-    </div>
-</div>
-
-<div class="grid-2">
-    <div class="card">
-        <h3>Left Normalized Structure</h3>
-
-        <div th:if="${leftRequest.contentTypeCategory != null and leftRequest.contentTypeCategory.name() == 'JSON'}">
-            <pre th:text="${leftNormalizedStructureFormatted}"></pre>
-        </div>
-
-        <div th:if="${leftRequest.contentTypeCategory != null and (leftRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or leftRequest.contentTypeCategory.name() == 'MULTIPART')}">
-            <table th:if="${!#lists.isEmpty(leftRequest.bodyFields)}">
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="field : ${leftRequest.bodyFields}">
-                    <td th:text="${field.fieldPath}"></td>
-                    <td th:text="${field.valueType}"></td>
-                </tr>
-                </tbody>
-            </table>
-            <p th:if="${#lists.isEmpty(leftRequest.bodyFields)}" class="empty">No normalized structure</p>
-        </div>
-
-        <div th:if="${leftRequest.contentTypeCategory == null or leftRequest.contentTypeCategory.name() == 'UNKNOWN'}">
-            <pre th:text="${leftRequest.normalizedStructureJson != null ? leftRequest.normalizedStructureJson : '{}'}"></pre>
-        </div>
-    </div>
-
-    <div class="card">
-        <h3>Right Normalized Structure</h3>
-
-        <div th:if="${rightRequest.contentTypeCategory != null and rightRequest.contentTypeCategory.name() == 'JSON'}">
-            <pre th:text="${rightNormalizedStructureFormatted}"></pre>
-        </div>
-
-        <div th:if="${rightRequest.contentTypeCategory != null and (rightRequest.contentTypeCategory.name() == 'FORM_URLENCODED' or rightRequest.contentTypeCategory.name() == 'MULTIPART')}">
-            <table th:if="${!#lists.isEmpty(rightRequest.bodyFields)}">
-                <thead>
-                <tr>
-                    <th>Field</th>
-                    <th>Type</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="field : ${rightRequest.bodyFields}">
-                    <td th:text="${field.fieldPath}"></td>
-                    <td th:text="${field.valueType}"></td>
-                </tr>
-                </tbody>
-            </table>
-            <p th:if="${#lists.isEmpty(rightRequest.bodyFields)}" class="empty">No normalized structure</p>
-        </div>
-
-        <div th:if="${rightRequest.contentTypeCategory == null or rightRequest.contentTypeCategory.name() == 'UNKNOWN'}">
-            <pre th:text="${rightRequest.normalizedStructureJson != null ? rightRequest.normalizedStructureJson : '{}'}"></pre>
-        </div>
-    </div>
 </div>
 
 </body>
