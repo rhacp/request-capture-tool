@@ -10,4 +10,8 @@ public interface NormalizationService {
     void normalizeFormUrlEncodedBody(HttpServletRequest request, CapturedRequest capturedRequest);
 
     void normalizeMultipartBody(HttpServletRequest request, CapturedRequest capturedRequest);
+
+    void normalizeJsonBody(String rawBody, CapturedRequest capturedRequest);
+
+    void normalizeFormUrlEncodedBody(String rawBody, CapturedRequest capturedRequest);
 }

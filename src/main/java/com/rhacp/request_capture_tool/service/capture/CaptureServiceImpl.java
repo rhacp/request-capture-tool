@@ -1,5 +1,7 @@
 package com.rhacp.request_capture_tool.service.capture;
 
+import com.rhacp.request_capture_tool.model.dto.ApiResponseCaptureDTO;
+import com.rhacp.request_capture_tool.model.dto.RestResponseDTO;
 import com.rhacp.request_capture_tool.model.entity.CapturedHeader;
 import com.rhacp.request_capture_tool.model.entity.CapturedQueryParam;
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -104,6 +107,114 @@ public class CaptureServiceImpl implements CaptureService {
         );
 
         return saved;
+    }
+
+    @Override
+    public RestResponseDTO captureRestRequest(SourceType sourceType, String group, HttpServletRequest request) {
+        CapturedRequest saved = captureRequest(sourceType, group, request);
+
+        return new RestResponseDTO(
+                saved.getId(),
+                saved.getGroupName(),
+                saved.getMethod(),
+                saved.getPath(),
+                null
+        );
+    }
+
+    @Override
+    @Transactional
+    public RestResponseDTO captureApiResponse(String group, ApiResponseCaptureDTO dto) {
+        ContentTypeCategory contentTypeCategory = resolveContentTypeCategory(dto.contentType());
+
+        log.info(
+                "Capturing API response: sourceType={}, group={}, method={}, path={}, statusCode={}, contentType={}, contentTypeCategory={}",
+                SourceType.RESPONSE,
+                group,
+                dto.originalMethod(),
+                dto.originalPath(),
+                dto.statusCode(),
+                dto.contentType(),
+                contentTypeCategory
+        );
+
+        CapturedRequest capturedRequest = CapturedRequest.builder()
+                .receivedAt(LocalDateTime.now())
+                .sourceType(SourceType.RESPONSE)
+                .groupName(group)
+                .method(dto.originalMethod())
+                .path(dto.originalPath())
+                .statusCode(dto.statusCode())
+                .contentType(dto.contentType())
+                .contentTypeCategory(contentTypeCategory)
+                .build();
+
+        extractResponseHeaders(dto, capturedRequest);
+
+        String rawBody = dto.responseBody();
+
+        if (rawBody == null || rawBody.isBlank()) {
+            capturedRequest.setBodyRaw(null);
+            capturedRequest.setNormalizedStructureJson("{}");
+        } else {
+            switch (contentTypeCategory) {
+                case JSON -> normalizationService.normalizeJsonBody(rawBody, capturedRequest);
+                case FORM_URLENCODED -> normalizationService.normalizeFormUrlEncodedBody(rawBody, capturedRequest);
+                case MULTIPART, UNKNOWN -> {
+                    capturedRequest.setBodyRaw(rawBody);
+                    capturedRequest.setNormalizedStructureJson("{}");
+                }
+            }
+        }
+
+        CapturedRequest saved = capturedRequestRepository.save(capturedRequest);
+
+        log.info(
+                "API response captured successfully: captureId={}, sourceType={}, group={}, statusCode={}, headersCount={}, bodyFieldsCount={}",
+                saved.getId(),
+                saved.getSourceType(),
+                saved.getGroupName(),
+                saved.getStatusCode(),
+                saved.getHeaders().size(),
+                saved.getBodyFields().size()
+        );
+
+        return new RestResponseDTO(
+                saved.getId(),
+                saved.getGroupName(),
+                saved.getMethod(),
+                saved.getPath(),
+                saved.getStatusCode()
+        );
+    }
+
+    private void extractResponseHeaders(ApiResponseCaptureDTO dto, CapturedRequest capturedRequest) {
+        if (dto.headers() == null || dto.headers().isEmpty()) {
+            log.debug("No response headers found for path={}", dto.originalPath());
+            return;
+        }
+
+        int extractedCount = 0;
+
+        for (Map.Entry<String, String> entry : dto.headers().entrySet()) {
+            String headerName = entry.getKey();
+            String headerValue = entry.getValue();
+
+            if (headerName == null || headerName.isBlank()) {
+                continue;
+            }
+
+            capturedRequest.addHeader(
+                    CapturedHeader.builder()
+                            .headerName(headerName.toLowerCase(Locale.ROOT))
+                            .headerValue(headerValue)
+                            .build()
+            );
+
+            extractedCount++;
+        }
+
+        log.debug("Extracted {} response headers for path={}", extractedCount, dto.originalPath());
     }
 
     private void extractHeaders(HttpServletRequest request, CapturedRequest capturedRequest) {

@@ -38,6 +38,9 @@ public class CapturedRequest {
     @Column(name = "path", nullable = false, columnDefinition = "TEXT")
     private String path;
 
+    @Column(name = "status_code")
+    private Integer statusCode;
+
     @Column(name = "content_type", columnDefinition = "TEXT")
     private String contentType;
 

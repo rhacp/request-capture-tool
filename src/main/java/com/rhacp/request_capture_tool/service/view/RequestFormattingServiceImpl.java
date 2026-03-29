@@ -1,7 +1,7 @@
 package com.rhacp.request_capture_tool.service.view;
 
-import com.rhacp.request_capture_tool.model.dto.BodyFieldItemView;
-import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
+import com.rhacp.request_capture_tool.model.dto.compare.BodyFieldItemView;
+import com.rhacp.request_capture_tool.model.dto.request.RequestDetailsView;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;

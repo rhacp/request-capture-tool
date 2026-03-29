@@ -43,31 +43,6 @@
             color: #ffffff;
         }
 
-        code {
-            display: block;
-            background: #0d0d0d;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #2d2d2d;
-            margin-bottom: 8px;
-            word-break: break-all;
-        }
-
-        .copy-btn {
-            margin-bottom: 12px;
-            padding: 6px 10px;
-            font-size: 12px;
-            background: #2a2a2a;
-            border: 1px solid #444;
-            color: #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        .copy-btn:hover {
-            background: #3a3a3a;
-        }
-
         a {
             color: #64b5f6;
             text-decoration: none;
@@ -118,23 +93,42 @@
             cursor: pointer;
             text-decoration: none;
             border-radius: 6px;
+            display: inline-block;
         }
 
         button:hover,
         .link-button:hover {
             background: #2e2e2e;
+            text-decoration: none;
+        }
+
+        .help-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .help-text {
+            flex: 1;
+            min-width: 280px;
         }
     </style>
-
-    <script>
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text);
-        }
-    </script>
 </head>
 <body>
 
 <h1>Captured Requests</h1>
+
+<div class="card help-card">
+    <div class="help-text">
+        <div class="section-title">Help</div>
+        <p class="muted">
+            View all capture endpoints, usage details, and the Postman response capture script.
+        </p>
+    </div>
+    <a class="link-button" href="/ui/help">Open help</a>
+</div>
 
 <div class="card">
     <div class="section-title">Filter</div>
@@ -156,32 +150,6 @@
        th:if="${selectedGroup != null and !#strings.isEmpty(selectedGroup)}">
         Showing only group: <strong th:text="${selectedGroup}"></strong>
     </p>
-</div>
-
-<div class="card">
-    <h3>Capture URLs</h3>
-
-    <div th:if="${selectedGroup != null and !#strings.isEmpty(selectedGroup)}">
-
-        <p><strong>BackUrl:</strong></p>
-        <code th:id="'backUrl'" th:text="${baseUrl + '/capture/backurl/' + selectedGroup}"></code>
-        <button class="copy-btn"
-                th:onclick="'copyToClipboard(' + '\'' + baseUrl + '/capture/backurl/' + selectedGroup + '\'' + ')'">
-            Copy
-        </button>
-
-        <p><strong>Webhook:</strong></p>
-        <code th:id="'webhookUrl'" th:text="${baseUrl + '/capture/webhook/' + selectedGroup}"></code>
-        <button class="copy-btn"
-                th:onclick="'copyToClipboard(' + '\'' + baseUrl + '/capture/webhook/' + selectedGroup + '\'' + ')'">
-            Copy
-        </button>
-
-    </div>
-
-    <div th:if="${selectedGroup == null or #strings.isEmpty(selectedGroup)}" class="muted">
-        Enter a group above to generate capture URLs
-    </div>
 </div>
 
 <div class="card">

@@ -1,4 +1,4 @@
-package com.rhacp.request_capture_tool.model.dto;
+package com.rhacp.request_capture_tool.model.dto.compare;
 
 import com.rhacp.request_capture_tool.util.enumeration.BodyValueType;
 

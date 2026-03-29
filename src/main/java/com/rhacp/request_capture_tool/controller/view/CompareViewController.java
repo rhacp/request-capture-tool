@@ -1,16 +1,18 @@
-package com.rhacp.request_capture_tool.controller;
+package com.rhacp.request_capture_tool.controller.view;
 
-import com.rhacp.request_capture_tool.model.dto.CompareResultView;
-import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
+import com.rhacp.request_capture_tool.model.dto.compare.CompareResultView;
+import com.rhacp.request_capture_tool.model.dto.request.RequestDetailsView;
 import com.rhacp.request_capture_tool.service.compare.CompareService;
 import com.rhacp.request_capture_tool.service.view.RequestFormattingService;
 import com.rhacp.request_capture_tool.service.view.RequestViewService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
+@RequestMapping("/ui/compare")
 public class CompareViewController {
 
     private final CompareService compareService;
@@ -29,7 +31,7 @@ public class CompareViewController {
         this.requestFormattingService = requestFormattingService;
     }
 
-    @GetMapping("/ui/compare")
+    @GetMapping
     public String compareRequests(
             @RequestParam Long leftId,
             @RequestParam Long rightId,

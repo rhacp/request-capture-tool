@@ -1,13 +1,14 @@
 package com.rhacp.request_capture_tool.service.compare;
 
-import com.rhacp.request_capture_tool.model.dto.BodyFieldItemView;
-import com.rhacp.request_capture_tool.model.dto.BodyFieldTypeMismatchView;
-import com.rhacp.request_capture_tool.model.dto.CompareResultView;
-import com.rhacp.request_capture_tool.model.dto.HeaderItemView;
-import com.rhacp.request_capture_tool.model.dto.QueryParamItemView;
-import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
+import com.rhacp.request_capture_tool.model.dto.compare.BodyFieldItemView;
+import com.rhacp.request_capture_tool.model.dto.compare.BodyFieldTypeMismatchView;
+import com.rhacp.request_capture_tool.model.dto.compare.CompareResultView;
+import com.rhacp.request_capture_tool.model.dto.request.HeaderItemView;
+import com.rhacp.request_capture_tool.model.dto.request.QueryParamItemView;
+import com.rhacp.request_capture_tool.model.dto.request.RequestDetailsView;
 import com.rhacp.request_capture_tool.service.common.HeaderIgnoreService;
 import com.rhacp.request_capture_tool.service.view.RequestViewService;
+import com.rhacp.request_capture_tool.util.enumeration.SourceType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +20,6 @@ import java.util.*;
 public class CompareServiceImpl implements CompareService {
 
     private final RequestViewService requestViewService;
-
     private final HeaderIgnoreService headerIgnoreService;
 
     public CompareServiceImpl(
@@ -50,6 +50,12 @@ public class CompareServiceImpl implements CompareService {
                 safeEnumName(right.contentTypeCategory())
         );
 
+        boolean compareStatusCode = left.sourceType() == SourceType.RESPONSE
+                && right.sourceType() == SourceType.RESPONSE;
+
+        boolean sameStatusCode = !compareStatusCode
+                || Objects.equals(left.statusCode(), right.statusCode());
+
         Set<String> leftHeaderNames = extractComparableHeaderNames(left.headers());
         Set<String> rightHeaderNames = extractComparableHeaderNames(right.headers());
 
@@ -77,6 +83,7 @@ public class CompareServiceImpl implements CompareService {
                 sameMethod
                         && sameSourceType
                         && sameContentTypeCategory
+                        && sameStatusCode
                         && headersOnlyInLeft.isEmpty()
                         && headersOnlyInRight.isEmpty()
                         && queryParamsOnlyInLeft.isEmpty()
@@ -102,6 +109,11 @@ public class CompareServiceImpl implements CompareService {
                 safeEnumName(left.contentTypeCategory()),
                 safeEnumName(right.contentTypeCategory()),
 
+                compareStatusCode,
+                sameStatusCode,
+                left.statusCode(),
+                right.statusCode(),
+
                 headerIgnoreService.getIgnoreRules(),
 
                 headersOnlyInLeft,
@@ -117,16 +129,18 @@ public class CompareServiceImpl implements CompareService {
         );
 
         log.debug(
-                "Compare finished: leftId={}, rightId={}, structurallyEqual={}, metadataMismatchCount={}, headerDiffs={}, queryParamDiffs={}, bodyOnlyLeft={}, bodyOnlyRight={}, bodyTypeMismatches={}",
+                "Compare finished: leftId={}, rightId={}, structurallyEqual={}, metadataMismatchCount={}, headerDiffs={}, queryParamDiffs={}, bodyOnlyLeft={}, bodyOnlyRight={}, bodyTypeMismatches={}, compareStatusCode={}, sameStatusCode={}",
                 leftId,
                 rightId,
                 structurallyEqual,
-                countMetadataMismatches(sameMethod, sameSourceType, sameContentTypeCategory),
+                countMetadataMismatches(sameMethod, sameSourceType, sameContentTypeCategory, compareStatusCode, sameStatusCode),
                 headersOnlyInLeft.size() + headersOnlyInRight.size(),
                 queryParamsOnlyInLeft.size() + queryParamsOnlyInRight.size(),
                 bodyFieldsOnlyInLeft.size(),
                 bodyFieldsOnlyInRight.size(),
-                bodyTypeMismatches.size()
+                bodyTypeMismatches.size(),
+                compareStatusCode,
+                sameStatusCode
         );
 
         return result;
@@ -247,7 +261,9 @@ public class CompareServiceImpl implements CompareService {
     private int countMetadataMismatches(
             boolean sameMethod,
             boolean sameSourceType,
-            boolean sameContentTypeCategory
+            boolean sameContentTypeCategory,
+            boolean compareStatusCode,
+            boolean sameStatusCode
     ) {
         int count = 0;
 
@@ -258,6 +274,9 @@ public class CompareServiceImpl implements CompareService {
             count++;
         }
         if (!sameContentTypeCategory) {
+            count++;
+        }
+        if (compareStatusCode && !sameStatusCode) {
             count++;
         }
 

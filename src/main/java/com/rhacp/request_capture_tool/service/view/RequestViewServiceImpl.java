@@ -1,9 +1,9 @@
 package com.rhacp.request_capture_tool.service.view;
 
-import com.rhacp.request_capture_tool.model.dto.BodyFieldItemView;
-import com.rhacp.request_capture_tool.model.dto.HeaderItemView;
-import com.rhacp.request_capture_tool.model.dto.QueryParamItemView;
-import com.rhacp.request_capture_tool.model.dto.RequestDetailsView;
+import com.rhacp.request_capture_tool.model.dto.compare.BodyFieldItemView;
+import com.rhacp.request_capture_tool.model.dto.request.HeaderItemView;
+import com.rhacp.request_capture_tool.model.dto.request.QueryParamItemView;
+import com.rhacp.request_capture_tool.model.dto.request.RequestDetailsView;
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
 import com.rhacp.request_capture_tool.repository.CapturedBodyFieldRepository;
 import com.rhacp.request_capture_tool.repository.CapturedHeaderRepository;
@@ -20,11 +20,8 @@ import java.util.List;
 public class RequestViewServiceImpl implements RequestViewService {
 
     private final CapturedRequestRepository capturedRequestRepository;
-
     private final CapturedHeaderRepository capturedHeaderRepository;
-
     private final CapturedQueryParamRepository capturedQueryParamRepository;
-
     private final CapturedBodyFieldRepository capturedBodyFieldRepository;
 
     public RequestViewServiceImpl(
@@ -106,13 +103,14 @@ public class RequestViewServiceImpl implements RequestViewService {
                 request.getGroupName(),
                 request.getMethod(),
                 request.getPath(),
+                request.getStatusCode(),
                 request.getContentType(),
                 request.getContentTypeCategory(),
-                request.getBodyRaw(),
-                request.getNormalizedStructureJson(),
                 headers,
                 queryParams,
-                bodyFields
+                bodyFields,
+                request.getBodyRaw(),
+                request.getNormalizedStructureJson()
         );
     }
 
@@ -124,13 +122,14 @@ public class RequestViewServiceImpl implements RequestViewService {
                 request.getGroupName(),
                 request.getMethod(),
                 request.getPath(),
+                request.getStatusCode(),
                 request.getContentType(),
                 request.getContentTypeCategory(),
+                List.of(),
+                List.of(),
+                List.of(),
                 request.getBodyRaw(),
-                request.getNormalizedStructureJson(),
-                List.of(),
-                List.of(),
-                List.of()
+                request.getNormalizedStructureJson()
         );
     }
 }

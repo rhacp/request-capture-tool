@@ -292,6 +292,9 @@
             <p><strong>Group:</strong> <span th:text="${leftRequest.groupName}"></span></p>
             <p><strong>Source Type:</strong> <span th:text="${leftRequest.sourceType}"></span></p>
             <p><strong>Method:</strong> <span th:text="${leftRequest.method}"></span></p>
+            <p th:if="${leftRequest.sourceType != null and leftRequest.sourceType.name() == 'RESPONSE'}">
+                <strong>Status Code:</strong> <span th:text="${leftRequest.statusCode}"></span>
+            </p>
             <p><strong>Content Type Category:</strong> <span th:text="${leftRequest.contentTypeCategory}"></span></p>
             <p><strong>Path:</strong> <span th:text="${leftRequest.path}"></span></p>
         </div>
@@ -304,6 +307,9 @@
             <p><strong>Group:</strong> <span th:text="${rightRequest.groupName}"></span></p>
             <p><strong>Source Type:</strong> <span th:text="${rightRequest.sourceType}"></span></p>
             <p><strong>Method:</strong> <span th:text="${rightRequest.method}"></span></p>
+            <p th:if="${rightRequest.sourceType != null and rightRequest.sourceType.name() == 'RESPONSE'}">
+                <strong>Status Code:</strong> <span th:text="${rightRequest.statusCode}"></span>
+            </p>
             <p><strong>Content Type Category:</strong> <span th:text="${rightRequest.contentTypeCategory}"></span></p>
             <p><strong>Path:</strong> <span th:text="${rightRequest.path}"></span></p>
         </div>
@@ -349,6 +355,15 @@
                 <td>
                     <span th:if="${compareResult.sameContentTypeCategory}" class="ok">MATCH</span>
                     <span th:unless="${compareResult.sameContentTypeCategory}" class="not-ok">MISMATCH</span>
+                </td>
+            </tr>
+            <tr th:if="${compareResult.compareStatusCode}">
+                <td>Status Code</td>
+                <td th:text="${compareResult.leftStatusCode}"></td>
+                <td th:text="${compareResult.rightStatusCode}"></td>
+                <td>
+                    <span th:if="${compareResult.sameStatusCode}" class="ok">MATCH</span>
+                    <span th:unless="${compareResult.sameStatusCode}" class="not-ok">MISMATCH</span>
                 </td>
             </tr>
             </tbody>

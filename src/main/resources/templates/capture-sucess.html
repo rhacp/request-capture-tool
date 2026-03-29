@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Request Captured</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+      background: #121212;
+      color: #e6e6e6;
+    }
+
+    .card {
+      max-width: 900px;
+      background: #1b1b1b;
+      border: 1px solid #2d2d2d;
+      border-left: 6px solid #2e7d32;
+      padding: 20px;
+      border-radius: 10px;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #ffffff;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    .muted {
+      color: #aaaaaa;
+    }
+
+    .links {
+      margin-top: 20px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    a {
+      color: #64b5f6;
+      text-decoration: none;
+      border: 1px solid #333;
+      background: #242424;
+      padding: 10px 14px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    a:hover {
+      background: #2e2e2e;
+      text-decoration: none;
+    }
+
+    .label {
+      color: #aaaaaa;
+    }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1 th:text="${title}">Request captured successfully</h1>
+  <p class="muted">The incoming request was captured and stored successfully.</p>
+
+  <p><span class="label">Capture ID:</span> <strong th:text="${captureId}">1</strong></p>
+  <p><span class="label">Group:</span> <strong th:text="${groupName}">group-a</strong></p>
+  <p><span class="label">Source Type:</span> <strong th:text="${sourceType}">BACKURL</strong></p>
+  <p><span class="label">Method:</span> <strong th:text="${method}">GET</strong></p>
+  <p><span class="label">Path:</span> <strong th:text="${path}">/capture/backurl/test</strong></p>
+  <p><span class="label">Content Type:</span> <strong th:text="${contentType}">application/json</strong></p>
+  <p><span class="label">Content Type Category:</span> <strong th:text="${contentTypeCategory}">JSON</strong></p>
+
+  <div class="links">
+    <a th:href="@{/ui/requests/{id}(id=${captureId})}">Open captured request</a>
+    <a th:href="@{/ui/requests}">Open dashboard</a>
+    <a th:href="@{/ui/requests(group=${groupName})}">Open this group</a>
+  </div>
+</div>
+</body>
+</html>

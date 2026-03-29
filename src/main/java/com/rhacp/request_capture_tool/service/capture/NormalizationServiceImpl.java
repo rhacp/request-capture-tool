@@ -144,6 +144,71 @@ public class NormalizationServiceImpl implements NormalizationService {
         }
     }
 
+    @Override
+    public void normalizeJsonBody(String rawBody, CapturedRequest capturedRequest) {
+        capturedRequest.setBodyRaw(rawBody);
+
+        if (rawBody == null || rawBody.isBlank()) {
+            log.debug("JSON body is empty for captured response. path={}", capturedRequest.getPath());
+            capturedRequest.setNormalizedStructureJson("{}");
+            return;
+        }
+
+        try {
+            JsonNode rootNode = objectMapper.readTree(rawBody);
+            Map<String, String> normalizedStructure = new LinkedHashMap<>();
+
+            extractJsonNode(rootNode, "", capturedRequest, normalizedStructure);
+
+            capturedRequest.setNormalizedStructureJson(writeJsonSafely(normalizedStructure));
+
+            log.debug(
+                    "JSON normalization completed for captured response. path={}, bodyFieldsCount={}, normalizedKeysCount={}",
+                    capturedRequest.getPath(),
+                    capturedRequest.getBodyFields().size(),
+                    normalizedStructure.size()
+            );
+        } catch (Exception e) {
+            log.warn("Failed to parse JSON response body for path={}: {}", capturedRequest.getPath(), e.getMessage());
+            capturedRequest.setNormalizedStructureJson("{\"_parseError\":\"INVALID_JSON\"}");
+        }
+    }
+
+    @Override
+    public void normalizeFormUrlEncodedBody(String rawBody, CapturedRequest capturedRequest) {
+        capturedRequest.setBodyRaw(rawBody);
+
+        if (rawBody == null || rawBody.isBlank()) {
+            log.debug("FORM_URLENCODED body is empty for captured response. path={}", capturedRequest.getPath());
+            capturedRequest.setNormalizedStructureJson("{}");
+            return;
+        }
+
+        List<NameValuePair> bodyParams = parseUrlEncodedString(rawBody);
+        Map<String, String> normalizedStructure = new LinkedHashMap<>();
+
+        for (NameValuePair pair : bodyParams) {
+            capturedRequest.addBodyField(
+                    CapturedBodyField.builder()
+                            .fieldPath(pair.name())
+                            .fieldValue(pair.value())
+                            .valueType(BodyValueType.STRING)
+                            .build()
+            );
+
+            normalizedStructure.put(pair.name(), BodyValueType.STRING.name());
+        }
+
+        capturedRequest.setNormalizedStructureJson(writeJsonSafely(normalizedStructure));
+
+        log.debug(
+                "FORM_URLENCODED normalization completed for captured response. path={}, bodyFieldsCount={}, normalizedKeysCount={}",
+                capturedRequest.getPath(),
+                capturedRequest.getBodyFields().size(),
+                normalizedStructure.size()
+        );
+    }
+
     private void extractJsonNode(
             JsonNode node,
             String currentPath,

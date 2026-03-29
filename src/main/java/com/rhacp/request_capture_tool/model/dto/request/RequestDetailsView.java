@@ -1,5 +1,6 @@
-package com.rhacp.request_capture_tool.model.dto;
+package com.rhacp.request_capture_tool.model.dto.request;
 
+import com.rhacp.request_capture_tool.model.dto.compare.BodyFieldItemView;
 import com.rhacp.request_capture_tool.util.enumeration.ContentTypeCategory;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
 
@@ -13,12 +14,13 @@ public record RequestDetailsView(
         String groupName,
         String method,
         String path,
+        Integer statusCode,
         String contentType,
         ContentTypeCategory contentTypeCategory,
-        String bodyRaw,
-        String normalizedStructureJson,
         List<HeaderItemView> headers,
         List<QueryParamItemView> queryParams,
-        List<BodyFieldItemView> bodyFields
+        List<BodyFieldItemView> bodyFields,
+        String bodyRaw,
+        String normalizedStructureJson
 ) {
 }
