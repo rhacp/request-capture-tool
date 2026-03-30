@@ -67,21 +67,50 @@
             color: #ffffff;
         }
 
-        form {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-
         input[type="text"],
-        input[type="number"] {
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        select {
             padding: 8px;
-            min-width: 160px;
             background: #181818;
             color: #e6e6e6;
             border: 1px solid #333333;
             border-radius: 6px;
+            box-sizing: border-box;
+            min-height: 38px;
+        }
+
+        input[type="text"] {
+            width: 220px;
+        }
+
+        select {
+            width: 160px;
+        }
+
+        input[type="date"] {
+            width: 170px;
+        }
+
+        input[type="time"] {
+            width: 140px;
+            appearance: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        input[type="time"]::-webkit-datetime-edit-ampm-field {
+            display: none;
+        }
+
+        input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+            display: flex;
+            justify-content: center;
         }
 
         button,
@@ -114,6 +143,51 @@
             flex: 1;
             min-width: 280px;
         }
+
+        .filter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 70px 220px 70px 160px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-row-datetime {
+            display: grid;
+            grid-template-columns: 70px 170px 140px;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 900px) {
+            .filter-row,
+            .filter-row-datetime {
+                grid-template-columns: 1fr;
+            }
+
+            input[type="text"],
+            select,
+            input[type="date"],
+            input[type="time"] {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -133,22 +207,57 @@
 <div class="card">
     <div class="section-title">Filter</div>
 
-    <form method="get" action="/ui/requests">
-        <label for="group"><strong>Group:</strong></label>
-        <input
-                type="text"
-                id="group"
-                name="group"
-                th:value="${selectedGroup}"
-                placeholder="Example: payment-test"
-        />
-        <button type="submit">Apply</button>
-        <a class="link-button" href="/ui/requests">Clear</a>
+    <form method="get" action="/ui/requests" class="filter-form">
+        <div class="filter-row">
+            <label class="filter-label" for="group">Group:</label>
+            <input type="text" id="group" name="group" th:value="${selectedGroup}" placeholder="Example: payment-test" />
+
+            <label class="filter-label" for="sourceType">Source:</label>
+            <select id="sourceType" name="sourceType">
+                <option value="">All</option>
+                <option value="BACKURL" th:selected="${selectedSourceType != null and selectedSourceType.name() == 'BACKURL'}">BACKURL</option>
+                <option value="WEBHOOK" th:selected="${selectedSourceType != null and selectedSourceType.name() == 'WEBHOOK'}">WEBHOOK</option>
+                <option value="RESPONSE" th:selected="${selectedSourceType != null and selectedSourceType.name() == 'RESPONSE'}">RESPONSE</option>
+            </select>
+        </div>
+
+        <div class="filter-row-datetime">
+            <label class="filter-label" for="receivedAtFromDate">From:</label>
+            <input type="date" id="receivedAtFromDate" name="receivedAtFromDate" th:value="${selectedReceivedAtFromDate}" />
+            <input type="time" id="receivedAtFromTime" name="receivedAtFromTime"
+                   th:value="${selectedReceivedAtFromTime != null and !#strings.isEmpty(selectedReceivedAtFromTime) ? selectedReceivedAtFromTime : '00:00'}"
+                   step="60" />
+        </div>
+
+        <div class="filter-row-datetime">
+            <label class="filter-label" for="receivedAtToDate">To:</label>
+            <input type="date" id="receivedAtToDate" name="receivedAtToDate" th:value="${selectedReceivedAtToDate}" />
+            <input type="time" id="receivedAtToTime" name="receivedAtToTime"
+                   th:value="${selectedReceivedAtToTime != null and !#strings.isEmpty(selectedReceivedAtToTime) ? selectedReceivedAtToTime : '00:00'}"
+                   step="60" />
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit">Apply</button>
+            <a class="link-button" href="/ui/requests">Clear</a>
+        </div>
     </form>
 
     <p class="muted"
-       th:if="${selectedGroup != null and !#strings.isEmpty(selectedGroup)}">
-        Showing only group: <strong th:text="${selectedGroup}"></strong>
+       th:if="${(selectedGroup != null and !#strings.isEmpty(selectedGroup)) or selectedSourceType != null or (selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)) or (selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate))}">
+        Active filters:
+        <span th:if="${selectedGroup != null and !#strings.isEmpty(selectedGroup)}">
+            group=<strong th:text="${selectedGroup}"></strong>
+        </span>
+        <span th:if="${selectedSourceType != null}">
+            source=<strong th:text="${selectedSourceType}"></strong>
+        </span>
+        <span th:if="${selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)}">
+            from=<strong th:text="${selectedReceivedAtFromDate + ' ' + (selectedReceivedAtFromTime != null and !#strings.isEmpty(selectedReceivedAtFromTime) ? selectedReceivedAtFromTime : '00:00')}"></strong>
+        </span>
+        <span th:if="${selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate)}">
+            to=<strong th:text="${selectedReceivedAtToDate + ' ' + (selectedReceivedAtToTime != null and !#strings.isEmpty(selectedReceivedAtToTime) ? selectedReceivedAtToTime : '00:00')}"></strong>
+        </span>
     </p>
 </div>
 

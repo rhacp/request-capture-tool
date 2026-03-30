@@ -9,10 +9,17 @@ import com.rhacp.request_capture_tool.repository.CapturedBodyFieldRepository;
 import com.rhacp.request_capture_tool.repository.CapturedHeaderRepository;
 import com.rhacp.request_capture_tool.repository.CapturedQueryParamRepository;
 import com.rhacp.request_capture_tool.repository.CapturedRequestRepository;
+import com.rhacp.request_capture_tool.util.enumeration.SourceType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,8 +27,11 @@ import java.util.List;
 public class RequestViewServiceImpl implements RequestViewService {
 
     private final CapturedRequestRepository capturedRequestRepository;
+
     private final CapturedHeaderRepository capturedHeaderRepository;
+
     private final CapturedQueryParamRepository capturedQueryParamRepository;
+
     private final CapturedBodyFieldRepository capturedBodyFieldRepository;
 
     public RequestViewServiceImpl(
@@ -38,26 +48,35 @@ public class RequestViewServiceImpl implements RequestViewService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<RequestDetailsView> getAllRequests() {
-        List<RequestDetailsView> requests = capturedRequestRepository.findAllByOrderByReceivedAtDesc()
+    public List<RequestDetailsView> getFilteredRequests(
+            String groupName,
+            SourceType sourceType,
+            LocalDateTime receivedAtFrom,
+            LocalDateTime receivedAtTo
+    ) {
+        Specification<CapturedRequest> specification = buildSpecification(
+                groupName,
+                sourceType,
+                receivedAtFrom,
+                receivedAtTo
+        );
+
+        List<RequestDetailsView> requests = capturedRequestRepository.findAll(
+                        specification,
+                        Sort.by(Sort.Direction.DESC, "receivedAt")
+                )
                 .stream()
                 .map(this::toSummaryView)
                 .toList();
 
-        log.debug("Loaded {} request summaries for UI list page", requests.size());
-
-        return requests;
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<RequestDetailsView> getRequestsByGroup(String groupName) {
-        List<RequestDetailsView> requests = capturedRequestRepository.findByGroupNameOrderByReceivedAtDesc(groupName)
-                .stream()
-                .map(this::toSummaryView)
-                .toList();
-
-        log.debug("Loaded {} request summaries for group='{}'", requests.size(), groupName);
+        log.debug(
+                "Loaded {} request summaries with filters: groupName='{}', sourceType='{}', receivedAtFrom='{}', receivedAtTo='{}'",
+                requests.size(),
+                groupName,
+                sourceType,
+                receivedAtFrom,
+                receivedAtTo
+        );
 
         return requests;
     }
@@ -112,6 +131,40 @@ public class RequestViewServiceImpl implements RequestViewService {
                 request.getBodyRaw(),
                 request.getNormalizedStructureJson()
         );
+    }
+
+    private Specification<CapturedRequest> buildSpecification(
+            String groupName,
+            SourceType sourceType,
+            LocalDateTime receivedAtFrom,
+            LocalDateTime receivedAtTo
+    ) {
+        return (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if (StringUtils.hasText(groupName)) {
+                predicates.add(
+                        cb.like(
+                                cb.lower(root.get("groupName")),
+                                "%" + groupName.trim().toLowerCase() + "%"
+                        )
+                );
+            }
+
+            if (sourceType != null) {
+                predicates.add(cb.equal(root.get("sourceType"), sourceType));
+            }
+
+            if (receivedAtFrom != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("receivedAt"), receivedAtFrom));
+            }
+
+            if (receivedAtTo != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("receivedAt"), receivedAtTo));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
     }
 
     private RequestDetailsView toSummaryView(CapturedRequest request) {

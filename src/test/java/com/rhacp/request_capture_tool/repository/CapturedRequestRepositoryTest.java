@@ -11,6 +11,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -60,7 +62,7 @@ class CapturedRequestRepositoryTest {
 
         assertThat(saved.getId()).isNotNull();
 
-        List<CapturedRequest> found = repository.findAllByOrderByReceivedAtDesc();
+        List<CapturedRequest> found = repository.findAll(Sort.by(Sort.Direction.DESC, "receivedAt"));
 
         assertThat(found).hasSize(1);
 
@@ -73,7 +75,7 @@ class CapturedRequestRepositoryTest {
     }
 
     @Test
-    @DisplayName("Should filter by group name")
+    @DisplayName("Should filter by group name using specification")
     void shouldFilterByGroupName() {
         repository.save(CapturedRequest.builder()
                 .receivedAt(LocalDateTime.now())
@@ -95,14 +97,20 @@ class CapturedRequestRepositoryTest {
                 .contentTypeCategory(ContentTypeCategory.FORM_URLENCODED)
                 .build());
 
-        List<CapturedRequest> results = repository.findByGroupNameOrderByReceivedAtDesc("group-a");
+        Specification<CapturedRequest> specification = (root, query, cb) ->
+                cb.equal(root.get("groupName"), "group-a");
+
+        List<CapturedRequest> results = repository.findAll(
+                specification,
+                Sort.by(Sort.Direction.DESC, "receivedAt")
+        );
 
         assertThat(results).hasSize(1);
         assertThat(results.get(0).getGroupName()).isEqualTo("group-a");
     }
 
     @Test
-    @DisplayName("Should filter by content type category")
+    @DisplayName("Should filter by content type category using specification")
     void shouldFilterByContentTypeCategory() {
         repository.save(CapturedRequest.builder()
                 .receivedAt(LocalDateTime.now())
@@ -124,8 +132,13 @@ class CapturedRequestRepositoryTest {
                 .contentTypeCategory(ContentTypeCategory.MULTIPART)
                 .build());
 
-        List<CapturedRequest> jsonResults =
-                repository.findByContentTypeCategoryOrderByReceivedAtDesc(ContentTypeCategory.JSON);
+        Specification<CapturedRequest> specification = (root, query, cb) ->
+                cb.equal(root.get("contentTypeCategory"), ContentTypeCategory.JSON);
+
+        List<CapturedRequest> jsonResults = repository.findAll(
+                specification,
+                Sort.by(Sort.Direction.DESC, "receivedAt")
+        );
 
         assertThat(jsonResults).hasSize(1);
         assertThat(jsonResults.get(0).getContentTypeCategory()).isEqualTo(ContentTypeCategory.JSON);
