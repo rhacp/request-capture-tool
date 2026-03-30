@@ -1,121 +1,154 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>Help - Request Capture Tool</title>
-  <meta charset="UTF-8">
-  <style>
-    * { box-sizing: border-box; }
+    <title>Help - Request Capture Tool</title>
+    <meta charset="UTF-8">
+    <style>
+        * { box-sizing: border-box; }
 
-    body {
-      font-family: Arial, sans-serif;
-      margin: 24px;
-      background: #121212;
-      color: #e6e6e6;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 24px;
+            background: #121212;
+            color: #e6e6e6;
+        }
 
-    h1, h2, h3 {
-      color: #ffffff;
-      margin-bottom: 12px;
-    }
+        h1, h2, h3 {
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
 
-    .card {
-      background: #1b1b1b;
-      border: 1px solid #2d2d2d;
-      border-radius: 10px;
-      padding: 18px;
-      margin-bottom: 20px;
-    }
+        .card {
+            background: #1b1b1b;
+            border: 1px solid #2d2d2d;
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+        }
 
-    .muted { color: #aaaaaa; }
+        .muted { color: #aaaaaa; }
 
-    .endpoint {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: #232323;
-      border: 1px solid #3a3a3a;
-      color: #90caf9;
-      font-family: Consolas, monospace;
-      word-break: break-all;
-    }
+        .endpoint {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 8px;
+            background: #232323;
+            border: 1px solid #3a3a3a;
+            color: #90caf9;
+            font-family: Consolas, monospace;
+            word-break: break-all;
+        }
 
-    .method {
-      display: inline-block;
-      min-width: 60px;
-      text-align: center;
-      padding: 4px 8px;
-      border-radius: 999px;
-      font-weight: bold;
-      font-size: 12px;
-      margin-right: 10px;
-      border: 1px solid #3a3a3a;
-      background: #181818;
-    }
+        .method {
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 12px;
+            margin-right: 10px;
+            border: 1px solid #3a3a3a;
+            background: #181818;
+        }
 
-    .get { color: #81c784; border-color: #2e7d32; }
-    .post { color: #64b5f6; border-color: #1565c0; }
+        .get { color: #81c784; border-color: #2e7d32; }
+        .post { color: #64b5f6; border-color: #1565c0; }
 
-    code.inline {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-family: Consolas, monospace;
-      color: #ffcc80;
-    }
+        code.inline {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            color: #ffcc80;
+        }
 
-    pre {
-      white-space: pre-wrap;
-      word-break: break-word;
-      overflow-wrap: anywhere;
-      background: #101010;
-      color: #e6e6e6;
-      border: 1px solid #2d2d2d;
-      padding: 14px;
-      border-radius: 8px;
-      overflow-x: auto;
-      line-height: 1.5;
-      margin-top: 12px;
-    }
+        pre {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            background: #101010;
+            color: #e6e6e6;
+            border: 1px solid #2d2d2d;
+            padding: 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            line-height: 1.5;
+            margin-top: 12px;
+        }
 
-    ul { margin-top: 8px; }
-    li { margin-bottom: 8px; }
+        ul { margin-top: 8px; }
+        li { margin-bottom: 8px; }
 
-    a {
-      color: #64b5f6;
-      text-decoration: none;
-    }
+        a {
+            color: #64b5f6;
+            text-decoration: none;
+        }
 
-    a:hover { text-decoration: underline; }
+        a:hover { text-decoration: underline; }
 
-    .section-label {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #9e9e9e;
-      margin-bottom: 10px;
-    }
+        .section-label {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #9e9e9e;
+            margin-bottom: 10px;
+        }
 
-    .copy-btn {
-      margin-top: 12px;
-      padding: 8px 12px;
-      font-size: 13px;
-      background: #242424;
-      border: 1px solid #3a3a3a;
-      color: #e6e6e6;
-      border-radius: 6px;
-      cursor: pointer;
-    }
+        .copy-btn {
+            margin-top: 12px;
+            padding: 8px 12px;
+            font-size: 13px;
+            background: #242424;
+            border: 1px solid #e6e6e6;
+            color: #e6e6e6;
+            border-radius: 18px;
+            cursor: pointer;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
 
-    .copy-btn:hover { background: #2e2e2e; }
-  </style>
+        .copy-btn:hover {
+            background: #2e2e2e;
+        }
 
-  <script>
-    function copyElementText(elementId) {
-      const text = document.getElementById(elementId).innerText;
-      navigator.clipboard.writeText(text);
-    }
-  </script>
+        .copy-btn.copied {
+            background: #1f3b28;
+            border-color: #2e7d32;
+            color: #81c784;
+        }
+
+        .endpoint-row {
+            margin-bottom: 12px;
+        }
+    </style>
+
+    <script>
+        function copyText(text, button) {
+            navigator.clipboard.writeText(text).then(function () {
+                const originalText = button.innerText;
+                button.innerText = "Copied!";
+                button.classList.add("copied");
+
+                setTimeout(function () {
+                    button.innerText = originalText;
+                    button.classList.remove("copied");
+                }, 1200);
+            });
+        }
+
+        function copyElementText(elementId, button) {
+            const text = document.getElementById(elementId).innerText;
+            copyText(text, button);
+        }
+
+        function copyCombinedText(elementIds, button) {
+            const text = elementIds
+                .map(id => document.getElementById(id).innerText)
+                .join("\n");
+            copyText(text, button);
+        }
+    </script>
 </head>
 <body>
 
@@ -124,55 +157,58 @@
 <h1>Help</h1>
 
 <div class="card">
-  <div class="section-label">Overview</div>
-  <ul>
-    <li>BackURL capture</li>
-    <li>Webhook capture</li>
-    <li>API response capture from Postman</li>
-  </ul>
+    <div class="section-label">Overview</div>
+    <ul>
+        <li>BackURL capture</li>
+        <li>Webhook capture</li>
+        <li>API response capture from Postman</li>
+    </ul>
 </div>
 
 <div class="card">
-  <h2>1. BackURL</h2>
-  <p>
-    <span class="method get">GET</span>
-    <span class="endpoint" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
-  </p>
-  <p>
-    <span class="method post">POST</span>
-    <span class="endpoint" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
-  </p>
+    <h2>1. BackURL</h2>
+    <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="endpoint" id="backurl-get" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
+    </div>
+    <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="endpoint" id="backurl-post" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
+    </div>
+    <button class="copy-btn" onclick="copyCombinedText(['backurl-get', 'backurl-post'], this)">Copy endpoint</button>
 </div>
 
 <div class="card">
-  <h2>2. Webhook</h2>
-  <p>
-    <span class="method get">GET</span>
-    <span class="endpoint" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
-  </p>
-  <p>
-    <span class="method post">POST</span>
-    <span class="endpoint" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
-  </p>
+    <h2>2. Webhook</h2>
+    <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="endpoint" id="webhook-get" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
+    </div>
+    <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="endpoint" id="webhook-post" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
+    </div>
+    <button class="copy-btn" onclick="copyCombinedText(['webhook-get', 'webhook-post'], this)">Copy endpoint</button>
 </div>
 
 <div class="card">
-  <h2>3. Response Capture</h2>
-  <p>
-    <span class="method post">POST</span>
-    <span class="endpoint" th:text="${baseUrl + '/capture/response/{group}'}"></span>
-  </p>
+    <h2>3. Response Capture</h2>
+    <div class="endpoint-row">
+        <span class="method post">POST</span>
+        <span class="endpoint" id="response-post" th:text="${baseUrl + '/capture/response/{group}'}"></span>
+    </div>
+    <button class="copy-btn" onclick="copyElementText('response-post', this)">Copy endpoint</button>
 </div>
 
 <div class="card">
-  <h2>4. Where To Add Script</h2>
-  <p><strong>Request → Scripts → Post-response</strong> (Tests tab)</p>
+    <h2>4. Where To Add Script</h2>
+    <p><strong>Request → Scripts → Post-response</strong> (Tests tab)</p>
 </div>
 
 <div class="card">
-  <h2>5. Postman Script</h2>
+    <h2>5. Postman Script</h2>
 
-  <pre id="postman-script">const baseUrl = "http://localhost:8080";
+    <pre id="postman-script">const baseUrl = "http://localhost:8080";
 
 // extract group from request URL (last segment)
 const urlParts = pm.request.url.toString().split("/");
@@ -200,16 +236,16 @@ pm.sendRequest({
     }
 });</pre>
 
-  <button class="copy-btn" onclick="copyElementText('postman-script')">Copy script</button>
+    <button class="copy-btn" onclick="copyElementText('postman-script', this)">Copy script</button>
 </div>
 
 <div class="card">
-  <h2>6. Usage</h2>
-  <ul>
-    <li>Group is taken automatically from your request URL</li>
-    <li>Use consistent endpoints like <code class="inline">/api/test-group</code></li>
-    <li>Compare results in UI</li>
-  </ul>
+    <h2>6. Usage</h2>
+    <ul>
+        <li>Group is taken automatically from your request URL</li>
+        <li>Use consistent endpoints like <code class="inline">/api/test-group</code></li>
+        <li>Compare results in UI</li>
+    </ul>
 </div>
 
 </body>

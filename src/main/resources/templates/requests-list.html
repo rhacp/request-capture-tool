@@ -210,31 +210,50 @@
     <form method="get" action="/ui/requests" class="filter-form">
         <div class="filter-row">
             <label class="filter-label" for="group">Group:</label>
-            <input type="text" id="group" name="group" th:value="${selectedGroup}" placeholder="Example: payment-test" />
+            <input
+                    type="text"
+                    id="group"
+                    name="group"
+                    placeholder="Example: payment-test"
+                    th:value="${(selectedGroup != null and !#strings.isEmpty(selectedGroup)) ? selectedGroup : (!#lists.isEmpty(param.group) ? param.group[0] : '')}" />
 
             <label class="filter-label" for="sourceType">Source:</label>
             <select id="sourceType" name="sourceType">
                 <option value="">All</option>
-                <option value="BACKURL" th:selected="${selectedSourceType != null and selectedSourceType.name() == 'BACKURL'}">BACKURL</option>
-                <option value="WEBHOOK" th:selected="${selectedSourceType != null and selectedSourceType.name() == 'WEBHOOK'}">WEBHOOK</option>
-                <option value="RESPONSE" th:selected="${selectedSourceType != null and selectedSourceType.name() == 'RESPONSE'}">RESPONSE</option>
+                <option value="BACKURL" th:selected="${(selectedSourceType != null and selectedSourceType.name() == 'BACKURL') or (!#lists.isEmpty(param.sourceType) and param.sourceType[0] == 'BACKURL')}">BACKURL</option>
+                <option value="WEBHOOK" th:selected="${(selectedSourceType != null and selectedSourceType.name() == 'WEBHOOK') or (!#lists.isEmpty(param.sourceType) and param.sourceType[0] == 'WEBHOOK')}">WEBHOOK</option>
+                <option value="RESPONSE" th:selected="${(selectedSourceType != null and selectedSourceType.name() == 'RESPONSE') or (!#lists.isEmpty(param.sourceType) and param.sourceType[0] == 'RESPONSE')}">RESPONSE</option>
             </select>
         </div>
 
         <div class="filter-row-datetime">
             <label class="filter-label" for="receivedAtFromDate">From:</label>
-            <input type="date" id="receivedAtFromDate" name="receivedAtFromDate" th:value="${selectedReceivedAtFromDate}" />
-            <input type="time" id="receivedAtFromTime" name="receivedAtFromTime"
-                   th:value="${selectedReceivedAtFromTime != null and !#strings.isEmpty(selectedReceivedAtFromTime) ? selectedReceivedAtFromTime : '00:00'}"
-                   step="60" />
+            <input
+                    type="date"
+                    id="receivedAtFromDate"
+                    name="receivedAtFromDate"
+                    th:value="${(selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)) ? selectedReceivedAtFromDate : (!#lists.isEmpty(param.receivedAtFromDate) ? param.receivedAtFromDate[0] : T(java.time.LocalDate).now().toString())}" />
+            <input
+                    type="time"
+                    id="receivedAtFromTime"
+                    name="receivedAtFromTime"
+                    step="60"
+                    th:value="${(selectedReceivedAtFromTime != null and !#strings.isEmpty(selectedReceivedAtFromTime)) ? selectedReceivedAtFromTime : (!#lists.isEmpty(param.receivedAtFromTime) ? param.receivedAtFromTime[0] : '00:00')}" />
         </div>
 
         <div class="filter-row-datetime">
             <label class="filter-label" for="receivedAtToDate">To:</label>
-            <input type="date" id="receivedAtToDate" name="receivedAtToDate" th:value="${selectedReceivedAtToDate}" />
-            <input type="time" id="receivedAtToTime" name="receivedAtToTime"
-                   th:value="${selectedReceivedAtToTime != null and !#strings.isEmpty(selectedReceivedAtToTime) ? selectedReceivedAtToTime : '00:00'}"
-                   step="60" />
+            <input
+                    type="date"
+                    id="receivedAtToDate"
+                    name="receivedAtToDate"
+                    th:value="${(selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate)) ? selectedReceivedAtToDate : (!#lists.isEmpty(param.receivedAtToDate) ? param.receivedAtToDate[0] : T(java.time.LocalDate).now().toString())}" />
+            <input
+                    type="time"
+                    id="receivedAtToTime"
+                    name="receivedAtToTime"
+                    step="60"
+                    th:value="${(selectedReceivedAtToTime != null and !#strings.isEmpty(selectedReceivedAtToTime)) ? selectedReceivedAtToTime : (!#lists.isEmpty(param.receivedAtToTime) ? param.receivedAtToTime[0] : '00:00')}" />
         </div>
 
         <div class="filter-actions">
@@ -244,19 +263,19 @@
     </form>
 
     <p class="muted"
-       th:if="${(selectedGroup != null and !#strings.isEmpty(selectedGroup)) or selectedSourceType != null or (selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)) or (selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate))}">
+       th:if="${(selectedGroup != null and !#strings.isEmpty(selectedGroup)) or !#lists.isEmpty(param.group) or selectedSourceType != null or !#lists.isEmpty(param.sourceType) or (selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)) or !#lists.isEmpty(param.receivedAtFromDate) or (selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate)) or !#lists.isEmpty(param.receivedAtToDate)}">
         Active filters:
-        <span th:if="${selectedGroup != null and !#strings.isEmpty(selectedGroup)}">
-            group=<strong th:text="${selectedGroup}"></strong>
+        <span th:if="${(selectedGroup != null and !#strings.isEmpty(selectedGroup)) or !#lists.isEmpty(param.group)}">
+            group=<strong th:text="${(selectedGroup != null and !#strings.isEmpty(selectedGroup)) ? selectedGroup : param.group[0]}"></strong>
         </span>
-        <span th:if="${selectedSourceType != null}">
-            source=<strong th:text="${selectedSourceType}"></strong>
+        <span th:if="${selectedSourceType != null or !#lists.isEmpty(param.sourceType)}">
+            source=<strong th:text="${selectedSourceType != null ? selectedSourceType : param.sourceType[0]}"></strong>
         </span>
-        <span th:if="${selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)}">
-            from=<strong th:text="${selectedReceivedAtFromDate + ' ' + (selectedReceivedAtFromTime != null and !#strings.isEmpty(selectedReceivedAtFromTime) ? selectedReceivedAtFromTime : '00:00')}"></strong>
+        <span th:if="${(selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)) or !#lists.isEmpty(param.receivedAtFromDate)}">
+            from=<strong th:text="${((selectedReceivedAtFromDate != null and !#strings.isEmpty(selectedReceivedAtFromDate)) ? selectedReceivedAtFromDate : param.receivedAtFromDate[0]) + ' ' + ((selectedReceivedAtFromTime != null and !#strings.isEmpty(selectedReceivedAtFromTime)) ? selectedReceivedAtFromTime : (!#lists.isEmpty(param.receivedAtFromTime) ? param.receivedAtFromTime[0] : '00:00'))}"></strong>
         </span>
-        <span th:if="${selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate)}">
-            to=<strong th:text="${selectedReceivedAtToDate + ' ' + (selectedReceivedAtToTime != null and !#strings.isEmpty(selectedReceivedAtToTime) ? selectedReceivedAtToTime : '00:00')}"></strong>
+        <span th:if="${(selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate)) or !#lists.isEmpty(param.receivedAtToDate)}">
+            to=<strong th:text="${((selectedReceivedAtToDate != null and !#strings.isEmpty(selectedReceivedAtToDate)) ? selectedReceivedAtToDate : param.receivedAtToDate[0]) + ' ' + ((selectedReceivedAtToTime != null and !#strings.isEmpty(selectedReceivedAtToTime)) ? selectedReceivedAtToTime : (!#lists.isEmpty(param.receivedAtToTime) ? param.receivedAtToTime[0] : '00:00'))}"></strong>
         </span>
     </p>
 </div>
