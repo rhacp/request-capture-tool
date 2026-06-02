@@ -1,6 +1,7 @@
 package com.rhacp.request_capture_tool.service.capture;
 
 import com.rhacp.request_capture_tool.model.dto.ApiResponseCaptureDTO;
+import com.rhacp.request_capture_tool.model.dto.CallbackResponseDTO;
 import com.rhacp.request_capture_tool.model.dto.RestResponseDTO;
 import com.rhacp.request_capture_tool.model.entity.CapturedHeader;
 import com.rhacp.request_capture_tool.model.entity.CapturedQueryParam;
@@ -9,6 +10,7 @@ import com.rhacp.request_capture_tool.repository.CapturedRequestRepository;
 import com.rhacp.request_capture_tool.util.enumeration.ContentTypeCategory;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -120,6 +122,16 @@ public class CaptureServiceImpl implements CaptureService {
                 saved.getPath(),
                 null
         );
+    }
+
+    public CallbackResponseDTO captureCallbackRestRequest(SourceType sourceType, String group, String status, HttpServletRequest request) {
+        CapturedRequest saved = captureRequest(sourceType, group, request);
+
+        if (!Set.of("PROCEED", "DECLINE").contains(status)) {
+            throw new IllegalArgumentException("Invalid status: " + status);
+        }
+
+        return new CallbackResponseDTO(status);
     }
 
     @Override

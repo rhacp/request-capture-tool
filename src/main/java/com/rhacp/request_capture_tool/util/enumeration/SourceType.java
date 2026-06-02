@@ -4,5 +4,6 @@ public enum SourceType {
 
     BACKURL,
     WEBHOOK,
-    RESPONSE
+    RESPONSE,
+    CALLBLACK
 }
