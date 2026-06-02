@@ -5,7 +5,6 @@ import com.rhacp.request_capture_tool.service.capture.CaptureService;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +22,6 @@ public class ConfirmCallbackController {
 
   @PostMapping(value = "/{group}/{status}")
   public ResponseEntity<CallbackResponseDTO> captureCallbackPost(@PathVariable String group, @PathVariable String status, HttpServletRequest request) {
-    return ResponseEntity.ok(captureService.captureRestRequest(SourceType.CALLBLACK, group, status, request));
+    return ResponseEntity.ok(captureService.captureCallbackRestRequest(SourceType.CALLBLACK, group, status, request));
   }
 }

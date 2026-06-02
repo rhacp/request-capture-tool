@@ -1,6 +1,7 @@
 package com.rhacp.request_capture_tool.service.capture;
 
 import com.rhacp.request_capture_tool.model.dto.ApiResponseCaptureDTO;
+import com.rhacp.request_capture_tool.model.dto.CallbackResponseDTO;
 import com.rhacp.request_capture_tool.model.dto.RestResponseDTO;
 import com.rhacp.request_capture_tool.model.entity.CapturedRequest;
 import com.rhacp.request_capture_tool.util.enumeration.SourceType;
@@ -13,4 +14,6 @@ public interface CaptureService {
     RestResponseDTO captureRestRequest(SourceType sourceType, String group, HttpServletRequest request);
 
     RestResponseDTO captureApiResponse(String group, ApiResponseCaptureDTO dto);
+
+    CallbackResponseDTO captureCallbackRestRequest(SourceType sourceType, String group, String status, HttpServletRequest request);
 }
