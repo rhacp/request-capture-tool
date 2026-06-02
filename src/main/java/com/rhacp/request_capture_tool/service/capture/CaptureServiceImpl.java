@@ -124,14 +124,14 @@ public class CaptureServiceImpl implements CaptureService {
         );
     }
 
-    public CallbackResponseDTO captureCallbackRestRequest(SourceType sourceType, String group, String status, HttpServletRequest request) {
+    public CallbackResponseDTO captureCallbackRestRequest(SourceType sourceType, String group, String action, HttpServletRequest request) {
         CapturedRequest saved = captureRequest(sourceType, group, request);
 
-        if (!Set.of("PROCEED", "DECLINE").contains(status)) {
-            throw new IllegalArgumentException("Invalid status: " + status);
+        if (!Set.of("PROCEED", "DECLINE").contains(action)) {
+            throw new IllegalArgumentException("Invalid status: " + action);
         }
 
-        return new CallbackResponseDTO(status);
+        return new CallbackResponseDTO(action);
     }
 
     @Override

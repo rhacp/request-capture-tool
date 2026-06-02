@@ -20,8 +20,8 @@ public class ConfirmCallbackController {
     this.captureService = captureService;
   }
 
-  @PostMapping(value = "/{group}/{status}")
-  public ResponseEntity<CallbackResponseDTO> captureCallbackPost(@PathVariable String group, @PathVariable String status, HttpServletRequest request) {
-    return ResponseEntity.ok(captureService.captureCallbackRestRequest(SourceType.CALLBLACK, group, status, request));
+  @PostMapping(value = "/{group}/{action}")
+  public ResponseEntity<CallbackResponseDTO> captureCallbackPost(@PathVariable String group, @PathVariable String action, HttpServletRequest request) {
+    return ResponseEntity.ok(captureService.captureCallbackRestRequest(SourceType.CALLBLACK, group, action, request));
   }
 }

@@ -11,5 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CallbackResponseDTO {
 
-  private String status;
+  private String action;
 }
