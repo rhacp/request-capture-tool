@@ -13,10 +13,7 @@
             color: #e6e6e6;
         }
 
-        h1, h2, h3 {
-            color: #ffffff;
-            margin-bottom: 12px;
-        }
+        h1, h2, h3 { color: #ffffff; margin-bottom: 12px; }
 
         .card {
             background: #1b1b1b;
@@ -81,11 +78,7 @@
         ul { margin-top: 8px; }
         li { margin-bottom: 8px; }
 
-        a {
-            color: #64b5f6;
-            text-decoration: none;
-        }
-
+        a { color: #64b5f6; text-decoration: none; }
         a:hover { text-decoration: underline; }
 
         .section-label {
@@ -108,9 +101,7 @@
             transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
         }
 
-        .copy-btn:hover {
-            background: #2e2e2e;
-        }
+        .copy-btn:hover { background: #2e2e2e; }
 
         .copy-btn.copied {
             background: #1f3b28;
@@ -118,9 +109,7 @@
             color: #81c784;
         }
 
-        .endpoint-row {
-            margin-bottom: 12px;
-        }
+        .endpoint-row { margin-bottom: 12px; }
     </style>
 
     <script>
@@ -138,14 +127,11 @@
         }
 
         function copyElementText(elementId, button) {
-            const text = document.getElementById(elementId).innerText;
-            copyText(text, button);
-        }
+            const text = document
+            .getElementById(elementId)
+            .innerText
+            .replace("{group}", "replaceThisToYourLiking");
 
-        function copyCombinedText(elementIds, button) {
-            const text = elementIds
-                .map(id => document.getElementById(id).innerText)
-                .join("\n");
             copyText(text, button);
         }
     </script>
@@ -161,52 +147,118 @@
     <ul>
         <li>BackURL capture</li>
         <li>Webhook capture</li>
+        <li>Callback confirmation capture</li>
         <li>API response capture from Postman</li>
+    </ul>
+
+    <div class="section-label">Usage</div>
+    <ul>
+        <li>Replace <code class="inline">{group}</code> with your own group name</li>
+        <li>Use consistent endpoints like <code class="inline">/api/test-group</code></li>
+        <li>Compare results in UI</li>
     </ul>
 </div>
 
 <div class="card">
     <h2>1. BackURL</h2>
+
+    <p class="muted">
+        Captures a redirect/back URL request and returns an HTML page with request details.
+    </p>
+
     <div class="endpoint-row">
         <span class="method get">GET</span>
-        <span class="endpoint" id="backurl-get" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
+        <span class="endpoint" id="backurl-endpoint" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
     </div>
     <div class="endpoint-row">
         <span class="method post">POST</span>
-        <span class="endpoint" id="backurl-post" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
+        <span class="endpoint" th:text="${baseUrl + '/capture/backurl/{group}'}"></span>
     </div>
-    <button class="copy-btn" onclick="copyCombinedText(['backurl-get', 'backurl-post'], this)">Copy endpoint</button>
+
+    <pre>Response:
+HTML page with captured request details</pre>
+
+    <button class="copy-btn" onclick="copyElementText('backurl-endpoint', this)">Copy endpoint</button>
 </div>
 
 <div class="card">
     <h2>2. Webhook</h2>
+
+    <p class="muted">
+        Captures webhook requests and returns a JSON summary of the captured request.
+    </p>
+
     <div class="endpoint-row">
         <span class="method get">GET</span>
-        <span class="endpoint" id="webhook-get" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
+        <span class="endpoint" id="webhook-endpoint" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
     </div>
     <div class="endpoint-row">
         <span class="method post">POST</span>
-        <span class="endpoint" id="webhook-post" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
+        <span class="endpoint" th:text="${baseUrl + '/capture/webhook/{group}'}"></span>
     </div>
-    <button class="copy-btn" onclick="copyCombinedText(['webhook-get', 'webhook-post'], this)">Copy endpoint</button>
+
+    <pre>{
+  "id": 1,
+  "groupName": "replaceThisToYourLiking",
+  "method": "POST",
+  "path": "/capture/webhook/replaceThisToYourLiking"
+}</pre>
+
+    <button class="copy-btn" onclick="copyElementText('webhook-endpoint', this)">Copy endpoint</button>
 </div>
 
 <div class="card">
-    <h2>3. Response Capture</h2>
+    <h2>3. Callback Confirmation</h2>
+
+    <p class="muted">
+        Captures a confirmation callback and returns the selected action.
+        Replace the last segment with
+        <code class="inline">PROCEED</code> or
+        <code class="inline">DECLINE</code>.
+    </p>
+
+    <div class="endpoint-row">
+        <span class="method get">GET</span>
+        <span class="endpoint" id="callback-endpoint" th:text="${baseUrl + '/capture/confirmCallback/{group}/PROCEED'}"></span>
+    </div>
+
+    <pre>{
+  "action": "PROCEED"
+}</pre>
+
+    <button class="copy-btn" onclick="copyElementText('callback-endpoint', this)">Copy endpoint</button>
+</div>
+
+<div class="card">
+    <h2>4. Response Capture</h2>
+
+    <p class="muted">
+        Captures an API response sent from Postman after a request completes.
+    </p>
+
     <div class="endpoint-row">
         <span class="method post">POST</span>
         <span class="endpoint" id="response-post" th:text="${baseUrl + '/capture/response/{group}'}"></span>
     </div>
+
+    <pre>{
+  "id": 1,
+  "groupName": "replaceThisToYourLiking",
+  "method": "POST",
+  "path": "https://example.com/api/test",
+  "statusCode": 200
+}</pre>
+
     <button class="copy-btn" onclick="copyElementText('response-post', this)">Copy endpoint</button>
 </div>
 
 <div class="card">
-    <h2>4. Where To Add Script</h2>
+    <h2>5. Where To Add Script</h2>
     <p><strong>Request → Scripts → Post-response</strong> (Tests tab)</p>
 </div>
 
 <div class="card">
-    <h2>5. Postman Script</h2>
+    <h2>6. Postman Script</h2>
 
     <pre id="postman-script">const baseUrl = "http://localhost:8080";
 
@@ -237,15 +289,6 @@ pm.sendRequest({
 });</pre>
 
     <button class="copy-btn" onclick="copyElementText('postman-script', this)">Copy script</button>
-</div>
-
-<div class="card">
-    <h2>6. Usage</h2>
-    <ul>
-        <li>Group is taken automatically from your request URL</li>
-        <li>Use consistent endpoints like <code class="inline">/api/test-group</code></li>
-        <li>Compare results in UI</li>
-    </ul>
 </div>
 
 </body>
